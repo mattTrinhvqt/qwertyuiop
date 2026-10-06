@@ -675,7 +675,7 @@
         </div>
       </section>
 
-      <iframe name="mmoodSaveFrame" class="hidden-frame" title="Mmood save response"></iframe>
+      <iframe id="mmoodSaveFrame" name="mmoodSaveFrame" class="hidden-frame" title="Mmood save response"></iframe>
     </main>
   </div>
 
@@ -692,8 +692,7 @@
         backendUrl: 'https://script.google.com/macros/s/AKfycbyVAVwOpdCbvwFe9jzOee0nk1v8mkafTChAuu15Dn81TyDADDEnRmI8LtP-U-qUhukgsA/exec',
         defaultRangeDays: 30,
         jsonpTimeoutMs: 20000,
-        saveVerifyDelayMs: 900,
-        saveVerifyAttempts: 5
+        saveRefreshDelayMs: 700
       });
 
       const state = {
@@ -720,6 +719,7 @@
         notesList: document.getElementById('notesList'),
         notesCount: document.getElementById('notesCount'),
         summaryRow: document.getElementById('summaryRow'),
+        saveFrame: document.getElementById('mmoodSaveFrame'),
         rangeTabs: Array.from(document.querySelectorAll('.range-tab'))
       };
 
@@ -1194,42 +1194,35 @@
         form.submit()
         form.remove()
 
-        window.setTimeout(() => verifySavedEntry(1), CONFIG.saveVerifyDelayMs)
       }
 
-      async function verifySavedEntry(attempt) {
+      async function confirmSavedFromFrame() {
         const pending = state.pendingSave
         if (!pending) return
 
+        let matchedEntry = null
+
         try {
           const entries = await fetchEntries()
-          const newEntry = [...entries].reverse().find(entry =>
+          matchedEntry = [...entries].reverse().find(entry =>
             !pending.beforeIds.has(entry.id) &&
             entry.mood === pending.mood &&
             entry.notes === pending.notes &&
             entry.epochMs >= pending.startedAt - 5000
-          )
+          ) || null
 
-          if (newEntry) {
-            state.entries = entries
-            state.pendingSave = null
-            finishSaveSuccess(newEntry)
-            return
-          }
-
-          if (attempt < CONFIG.saveVerifyAttempts) {
-            window.setTimeout(() => verifySavedEntry(attempt + 1), CONFIG.saveVerifyDelayMs)
-            return
-          }
-
-          finishSaveFailure()
+          state.entries = entries
         } catch (error) {
           console.error(error)
-          if (attempt < CONFIG.saveVerifyAttempts) {
-            window.setTimeout(() => verifySavedEntry(attempt + 1), CONFIG.saveVerifyDelayMs)
-            return
-          }
-          finishSaveFailure()
+        }
+
+        state.pendingSave = null
+        finishSaveSuccess(matchedEntry)
+
+        if (!matchedEntry) {
+          window.setTimeout(() => {
+            loadEntries({ preserveSelection: false })
+          }, CONFIG.saveRefreshDelayMs)
         }
       }
 
@@ -1237,7 +1230,7 @@
         els.saveButton.disabled = false
         els.saveButton.textContent = 'Save entry'
         setDataState('live', 'LIVE data')
-        setFormStatus('Saved ' + formatDateTime(newEntry.timestamp), 'success')
+        setFormStatus('Saved ' + formatDateTime(newEntry ? newEntry.timestamp : new Date()), 'success')
 
         document.querySelectorAll('input[name="mood"]').forEach(input => {
           input.checked = false
@@ -1245,18 +1238,20 @@
         els.notes.value = ''
         updateTimestampPreview()
 
-        state.selectedId = String(newEntry.id)
-        applyRange()
-        selectEntry(String(newEntry.id), true)
+        if (newEntry && newEntry.id) {
+          state.selectedId = String(newEntry.id)
+          applyRange()
+          selectEntry(String(newEntry.id), true)
+        } else {
+          applyRange()
+        }
       }
 
-      function finishSaveFailure() {
-        state.pendingSave = null
-        els.saveButton.disabled = false
-        els.saveButton.textContent = 'Save entry'
-        setDataState('offline', 'Save unconfirmed')
-        setFormStatus('The entry may have saved, but Mmood could not verify it yet. Refresh to check', 'error')
-      }
+      els.saveFrame.addEventListener('load', () => {
+        if (state.pendingSave) {
+          confirmSavedFromFrame()
+        }
+      })
 
       els.entryForm.addEventListener('submit', event => {
         event.preventDefault();
