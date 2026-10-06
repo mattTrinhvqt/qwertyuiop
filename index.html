@@ -8,12 +8,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 
   <style>
     :root {
       --mmood-blue: #0b2f5b;
+      --mmood-blue-soft: #eaf1f8;
+      --mmood-blue-selected: #eef4fa;
+      --mmood-blue-border: #bfd1e3;
+
       --mmood-ink: #151515;
       --mmood-muted: #69718a;
       --mmood-track: #e8eaf0;
@@ -21,6 +26,7 @@
       --mmood-positive: #14823b;
       --mmood-white: #ffffff;
       --mmood-soft: #f8f8fb;
+
       --mmood-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
       --app-max-width: 780px;
     }
@@ -47,11 +53,6 @@
     input,
     textarea {
       font: inherit;
-    }
-
-    button,
-    input,
-    textarea {
       -webkit-tap-highlight-color: transparent;
     }
 
@@ -90,7 +91,6 @@
       font-weight: 400;
       line-height: 1.1;
     }
-
 
     .data-state {
       display: inline-flex;
@@ -174,11 +174,12 @@
       border-radius: 6px;
       cursor: pointer;
       font-size: 15px;
+
       transition:
-        color 120ms ease,
-        border-color 120ms ease,
-        background-color 120ms ease,
-        transform 120ms ease;
+        color 110ms ease,
+        border-color 110ms ease,
+        background-color 110ms ease,
+        transform 110ms var(--mmood-motion-ease);
     }
 
     .mood-option input:checked + label {
@@ -210,14 +211,18 @@
       min-height: 84px;
       resize: vertical;
       padding: 10px 11px;
+
       color: var(--mmood-ink);
       background: var(--mmood-white);
+
       border: 1px solid var(--mmood-track);
       border-radius: 6px;
+
       font-size: 16px;
       line-height: 1.45;
       outline: none;
-      transition: border-color 120ms ease;
+
+      transition: border-color 110ms ease;
     }
 
     .notes-input:focus {
@@ -241,17 +246,22 @@
       min-width: 104px;
       min-height: 40px;
       padding: 0 16px;
+
       color: var(--mmood-white);
       background: var(--mmood-ink);
+
       border: 1px solid var(--mmood-ink);
       border-radius: 6px;
+
       cursor: pointer;
       font-size: 14px;
       font-weight: 700;
+
       transition:
-        background-color 120ms ease,
-        border-color 120ms ease,
-        opacity 120ms ease;
+        background-color 110ms ease,
+        border-color 110ms ease,
+        opacity 110ms ease,
+        transform 110ms var(--mmood-motion-ease);
     }
 
     .save-button:hover,
@@ -259,11 +269,13 @@
       background: var(--mmood-blue);
       border-color: var(--mmood-blue);
       outline: none;
+      transform: translateY(-1px);
     }
 
     .save-button:disabled {
       cursor: wait;
       opacity: 0.55;
+      transform: none;
     }
 
     .status {
@@ -307,6 +319,7 @@
       align-items: center;
       gap: 2px;
       padding: 2px;
+
       border: 1px solid var(--mmood-track);
       border-radius: 7px;
     }
@@ -315,23 +328,37 @@
       min-width: 42px;
       min-height: 30px;
       padding: 0 8px;
+
       color: var(--mmood-muted);
       background: transparent;
+
       border: 0;
       border-radius: 5px;
+
       cursor: pointer;
       font-size: 11px;
       font-weight: 700;
+
+      transition:
+        color 110ms ease,
+        background-color 110ms ease,
+        transform 110ms var(--mmood-motion-ease);
     }
 
     .range-tab.is-active {
       color: var(--mmood-blue);
-      background: #eaf1f8;
+      background: var(--mmood-blue-soft);
     }
 
     .range-tab:focus-visible {
       outline: 2px solid var(--mmood-blue);
       outline-offset: 1px;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .range-tab:hover {
+        transform: translateY(-1px);
+      }
     }
 
     .history-grid {
@@ -362,10 +389,13 @@
     .empty-state {
       position: absolute;
       inset: 0;
+
       display: none;
       align-items: center;
       justify-content: center;
+
       padding: 24px;
+
       color: var(--mmood-muted);
       font-size: 13px;
       text-align: center;
@@ -379,6 +409,7 @@
       display: flex;
       min-height: 0;
       flex-direction: column;
+
       border-left: 1px solid var(--mmood-track);
       padding-left: 12px;
     }
@@ -389,6 +420,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
+
       color: var(--mmood-muted);
       font-size: 12px;
     }
@@ -402,6 +434,7 @@
       overflow-y: auto;
       overscroll-behavior: contain;
       padding-right: 4px;
+
       scrollbar-width: thin;
       scrollbar-color: rgba(105, 113, 138, 0.35) transparent;
     }
@@ -409,16 +442,21 @@
     .note-item {
       width: 100%;
       padding: 9px 8px 10px;
+
       color: var(--mmood-ink);
       background: transparent;
+
       border: 0;
       border-bottom: 1px solid var(--mmood-track);
       border-radius: 0;
+
       cursor: pointer;
       text-align: left;
+
       transition:
         background-color 110ms ease,
         border-color 110ms ease;
+
       will-change: transform;
     }
 
@@ -427,8 +465,8 @@
     }
 
     .note-item.is-selected {
-      background: #eef4fa;
-      border-bottom-color: #bfd1e3;
+      background: var(--mmood-blue-selected);
+      border-bottom-color: var(--mmood-blue-border);
     }
 
     .note-item:focus-visible {
@@ -466,11 +504,6 @@
       word-break: break-word;
     }
 
-    .note-text.is-empty {
-      color: var(--mmood-muted);
-      font-style: italic;
-    }
-
     .loading-row {
       padding: 18px 8px;
       color: var(--mmood-muted);
@@ -483,6 +516,7 @@
       flex-wrap: wrap;
       gap: 12px 22px;
       margin-top: 10px;
+
       color: var(--mmood-muted);
       font-size: 11px;
     }
@@ -590,6 +624,7 @@
 <body>
   <div id="fit">
     <main id="app">
+
       <header class="app-header">
         <div class="app-title-wrap">
           <h1>Mmood</h1>
@@ -604,25 +639,66 @@
       <div class="gradient-line" aria-hidden="true"></div>
 
       <form id="entryForm" class="entry-form" autocomplete="off">
+
         <div>
           <div class="field-label">How are you feeling?</div>
 
           <div class="mood-row" role="radiogroup" aria-label="Mood score from 1 to 10">
-            <div class="mood-option"><input type="radio" id="mood1" name="mood" value="1"><label for="mood1">1</label></div>
-            <div class="mood-option"><input type="radio" id="mood2" name="mood" value="2"><label for="mood2">2</label></div>
-            <div class="mood-option"><input type="radio" id="mood3" name="mood" value="3"><label for="mood3">3</label></div>
-            <div class="mood-option"><input type="radio" id="mood4" name="mood" value="4"><label for="mood4">4</label></div>
-            <div class="mood-option"><input type="radio" id="mood5" name="mood" value="5"><label for="mood5">5</label></div>
-            <div class="mood-option"><input type="radio" id="mood6" name="mood" value="6"><label for="mood6">6</label></div>
-            <div class="mood-option"><input type="radio" id="mood7" name="mood" value="7"><label for="mood7">7</label></div>
-            <div class="mood-option"><input type="radio" id="mood8" name="mood" value="8"><label for="mood8">8</label></div>
-            <div class="mood-option"><input type="radio" id="mood9" name="mood" value="9"><label for="mood9">9</label></div>
-            <div class="mood-option"><input type="radio" id="mood10" name="mood" value="10"><label for="mood10">10</label></div>
+            <div class="mood-option">
+              <input type="radio" id="mood1" name="mood" value="1">
+              <label for="mood1">1</label>
+            </div>
+
+            <div class="mood-option">
+              <input type="radio" id="mood2" name="mood" value="2">
+              <label for="mood2">2</label>
+            </div>
+
+            <div class="mood-option">
+              <input type="radio" id="mood3" name="mood" value="3">
+              <label for="mood3">3</label>
+            </div>
+
+            <div class="mood-option">
+              <input type="radio" id="mood4" name="mood" value="4">
+              <label for="mood4">4</label>
+            </div>
+
+            <div class="mood-option">
+              <input type="radio" id="mood5" name="mood" value="5">
+              <label for="mood5">5</label>
+            </div>
+
+            <div class="mood-option">
+              <input type="radio" id="mood6" name="mood" value="6">
+              <label for="mood6">6</label>
+            </div>
+
+            <div class="mood-option">
+              <input type="radio" id="mood7" name="mood" value="7">
+              <label for="mood7">7</label>
+            </div>
+
+            <div class="mood-option">
+              <input type="radio" id="mood8" name="mood" value="8">
+              <label for="mood8">8</label>
+            </div>
+
+            <div class="mood-option">
+              <input type="radio" id="mood9" name="mood" value="9">
+              <label for="mood9">9</label>
+            </div>
+
+            <div class="mood-option">
+              <input type="radio" id="mood10" name="mood" value="10">
+              <label for="mood10">10</label>
+            </div>
           </div>
         </div>
 
         <div>
           <label class="field-label" for="notes">Notes</label>
+
           <textarea
             id="notes"
             class="notes-input"
@@ -633,67 +709,138 @@
 
         <div>
           <div class="form-bottom">
-            <div id="timestampPreview" class="timestamp-preview">Date and time are saved automatically</div>
-            <button id="saveButton" class="save-button" type="submit">Save entry</button>
+            <div id="timestampPreview" class="timestamp-preview">
+              Date and time are saved automatically
+            </div>
+
+            <button id="saveButton" class="save-button" type="submit">
+              Save entry
+            </button>
           </div>
-          <div id="formStatus" class="status" role="status" aria-live="polite"></div>
+
+          <div
+            id="formStatus"
+            class="status"
+            role="status"
+            aria-live="polite"
+          ></div>
         </div>
       </form>
 
       <section class="history" aria-labelledby="historyHeading">
+
         <div class="history-heading-row">
           <h2 id="historyHeading">Mood over time</h2>
 
           <div class="range-tabs" role="tablist" aria-label="Time range">
-            <button class="range-tab" type="button" data-range="7" role="tab" aria-selected="false">7D</button>
-            <button class="range-tab is-active" type="button" data-range="30" role="tab" aria-selected="true">30D</button>
-            <button class="range-tab" type="button" data-range="90" role="tab" aria-selected="false">90D</button>
-            <button class="range-tab" type="button" data-range="all" role="tab" aria-selected="false">All</button>
+            <button
+              class="range-tab"
+              type="button"
+              data-range="7"
+              role="tab"
+              aria-selected="false"
+            >
+              7D
+            </button>
+
+            <button
+              class="range-tab is-active"
+              type="button"
+              data-range="30"
+              role="tab"
+              aria-selected="true"
+            >
+              30D
+            </button>
+
+            <button
+              class="range-tab"
+              type="button"
+              data-range="90"
+              role="tab"
+              aria-selected="false"
+            >
+              90D
+            </button>
+
+            <button
+              class="range-tab"
+              type="button"
+              data-range="all"
+              role="tab"
+              aria-selected="false"
+            >
+              All
+            </button>
           </div>
         </div>
 
         <div class="history-grid">
+
           <div class="chart-panel">
             <div id="chartShell" class="chart-shell">
-              <canvas id="moodChart" aria-label="Mood score over time"></canvas>
-              <div class="empty-state">No entries in this time range yet</div>
+              <canvas
+                id="moodChart"
+                aria-label="Mood score over time"
+              ></canvas>
+
+              <div class="empty-state">
+                No entries in this time range yet
+              </div>
             </div>
 
-            <div id="summaryRow" class="summary-row" aria-live="polite"></div>
+            <div
+              id="summaryRow"
+              class="summary-row"
+              aria-live="polite"
+            ></div>
           </div>
 
           <aside class="notes-panel" aria-label="Mood notes">
+
             <div class="notes-panel-title">
               <span>Notes</span>
               <span id="notesCount" class="notes-count"></span>
             </div>
 
-            <div id="notesList" class="notes-list" tabindex="0">
-              <div class="loading-row">Loading entries…</div>
+            <div
+              id="notesList"
+              class="notes-list"
+              tabindex="0"
+            >
+              <div class="loading-row">
+                Loading entries…
+              </div>
             </div>
           </aside>
         </div>
       </section>
 
-      <iframe id="mmoodSaveFrame" name="mmoodSaveFrame" class="hidden-frame" title="Mmood save response"></iframe>
+      <iframe
+        id="mmoodSaveFrame"
+        name="mmoodSaveFrame"
+        class="hidden-frame"
+        title="Mmood save response"
+      ></iframe>
+
     </main>
   </div>
 
   <script>
     (() => {
-      'use strict';
+      'use strict'
 
-      const FLIP_DURATION_MS = 170;
-      const FLIP_EASING = 'cubic-bezier(0.22, 1, 0.36, 1)';
+      const FLIP_DURATION_MS = 170
+      const FLIP_EASING = 'cubic-bezier(0.22, 1, 0.36, 1)'
 
       const CONFIG = Object.freeze({
-        // STEP 1 AFTER DEPLOYING Code.gs:
-        // Replace this placeholder with your Apps Script /exec web-app URL.
-        backendUrl: 'https://script.google.com/macros/s/AKfycbyVAVwOpdCbvwFe9jzOee0nk1v8mkafTChAuu15Dn81TyDADDEnRmI8LtP-U-qUhukgsA/exec',
+        backendUrl:
+          'https://script.google.com/macros/s/AKfycbyVAVwOpdCbvwFe9jzOee0nk1v8mkafTChAuu15Dn81TyDADDEnRmI8LtP-U-qUhukgsA/exec',
+
         defaultRangeDays: 30,
         jsonpTimeoutMs: 20000,
         saveRefreshDelayMs: 700
-      });
+      })
 
       const state = {
         entries: [],
@@ -704,7 +851,7 @@
         pendingSave: null,
         callbackCounter: 0,
         pendingNotePositions: null
-      };
+      }
 
       const els = {
         entryForm: document.getElementById('entryForm'),
@@ -721,100 +868,181 @@
         summaryRow: document.getElementById('summaryRow'),
         saveFrame: document.getElementById('mmoodSaveFrame'),
         rangeTabs: Array.from(document.querySelectorAll('.range-tab'))
-      };
+      }
 
       function backendReady() {
-        return /^https:\/\/script\.google\.com\/macros\/s\/.+\/exec(?:\?.*)?$/.test(CONFIG.backendUrl);
+        return /^https:\/\/script\.google\.com\/macros\/s\/.+\/exec(?:\?.*)?$/
+          .test(CONFIG.backendUrl)
       }
 
       function setDataState(mode, text) {
-        els.dataState.classList.toggle('is-live', mode === 'live');
-        els.dataState.classList.toggle('is-saving', mode === 'saving');
-        els.dataStateText.textContent = text;
+        els.dataState.classList.toggle(
+          'is-live',
+          mode === 'live'
+        )
+
+        els.dataState.classList.toggle(
+          'is-saving',
+          mode === 'saving'
+        )
+
+        els.dataStateText.textContent = text
       }
 
       function setFormStatus(message, type = '') {
-        els.formStatus.textContent = message;
-        els.formStatus.classList.toggle('is-error', type === 'error');
-        els.formStatus.classList.toggle('is-success', type === 'success');
+        els.formStatus.textContent = message
+
+        els.formStatus.classList.toggle(
+          'is-error',
+          type === 'error'
+        )
+
+        els.formStatus.classList.toggle(
+          'is-success',
+          type === 'success'
+        )
       }
 
       function formatDateTime(value) {
-        const d = value instanceof Date ? value : new Date(value);
-        if (Number.isNaN(d.getTime())) return '';
+        const d = value instanceof Date
+          ? value
+          : new Date(value)
 
-        return new Intl.DateTimeFormat('en-AU', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        }).format(d);
+        if (Number.isNaN(d.getTime())) {
+          return ''
+        }
+
+        return new Intl.DateTimeFormat(
+          'en-AU',
+          {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          }
+        ).format(d)
+      }
+
+      function formatRoundedHour(value) {
+        const d = value instanceof Date
+          ? new Date(value)
+          : new Date(value)
+
+        if (Number.isNaN(d.getTime())) {
+          return ''
+        }
+
+        if (d.getMinutes() >= 30) {
+          d.setHours(d.getHours() + 1)
+        }
+
+        d.setMinutes(0, 0, 0)
+
+        return new Intl.DateTimeFormat(
+          'en-AU',
+          {
+            day: 'numeric',
+            month: 'short',
+            hour: 'numeric',
+            hour12: true
+          }
+        ).format(d)
       }
 
       function updateTimestampPreview() {
-        els.timestampPreview.textContent = 'Will save as ' + formatDateTime(new Date());
+        els.timestampPreview.textContent =
+          'Will save as ' + formatDateTime(new Date())
       }
 
       function jsonp(params) {
         return new Promise((resolve, reject) => {
           if (!backendReady()) {
-            reject(new Error('Add your Apps Script web-app URL to CONFIG.backendUrl first'));
-            return;
+            reject(
+              new Error(
+                'Add your Apps Script web-app URL to CONFIG.backendUrl first'
+              )
+            )
+            return
           }
 
-          const callbackName = '__mmoodJsonp' + (++state.callbackCounter);
-          const script = document.createElement('script');
-          const timer = window.setTimeout(() => cleanup(new Error('The data request timed out.')), CONFIG.jsonpTimeoutMs);
+          const callbackName =
+            '__mmoodJsonp' + (++state.callbackCounter)
+
+          const script =
+            document.createElement('script')
+
+          const timer =
+            window.setTimeout(
+              () => cleanup(
+                new Error('The data request timed out')
+              ),
+              CONFIG.jsonpTimeoutMs
+            )
 
           function cleanup(error, value) {
-            window.clearTimeout(timer);
-            delete window[callbackName];
-            script.remove();
-            if (error) reject(error);
-            else resolve(value);
+            window.clearTimeout(timer)
+
+            delete window[callbackName]
+            script.remove()
+
+            if (error) {
+              reject(error)
+            } else {
+              resolve(value)
+            }
           }
 
-          window[callbackName] = payload => cleanup(null, payload);
+          window[callbackName] =
+            payload => cleanup(null, payload)
 
-          const url = new URL(CONFIG.backendUrl);
-          Object.entries(params).forEach(([key, value]) => url.searchParams.set(key, value));
-          url.searchParams.set('callback', callbackName);
-          url.searchParams.set('_', Date.now().toString());
+          const url =
+            new URL(CONFIG.backendUrl)
 
-          script.onerror = () => cleanup(new Error('Could not reach the Mmood backend.'));
-          script.src = url.toString();
-          document.head.appendChild(script);
-        });
-      }
+          Object.entries(params)
+            .forEach(([key, value]) => {
+              url.searchParams.set(key, value)
+            })
 
-      async function loadEntries({ preserveSelection = true } = {}) {
-        if (!backendReady()) {
-          setDataState('offline', 'Setup required')
-          els.notesList.innerHTML = '<div class="loading-row">Add the Apps Script web-app URL in the HTML to connect Mmood</div>'
-          return
-        }
+          url.searchParams.set(
+            'callback',
+            callbackName
+          )
 
-        setDataState('loading', 'Loading…')
+          url.searchParams.set(
+            '_',
+            Date.now().toString()
+          )
 
-        try {
-          const previousSelection = preserveSelection ? state.selectedId : null
-          state.entries = await fetchEntries()
-          state.selectedId = previousSelection
-          applyRange()
-          setDataState('live', 'LIVE data')
-        } catch (error) {
-          console.error(error)
-          setDataState('offline', 'Unavailable')
-          els.notesList.innerHTML = '<div class="loading-row">Could not load entries</div>'
-          setFormStatus(error.message || 'Could not load entries', 'error')
-        }
+          script.onerror =
+            () => cleanup(
+              new Error(
+                'Could not reach the Mmood backend'
+              )
+            )
+
+          script.src = url.toString()
+
+          document.head.appendChild(script)
+        })
       }
 
       async function fetchEntries() {
-        const payload = await jsonp({ action: 'list' });
-        if (!payload || payload.ok !== true || !Array.isArray(payload.entries)) {
-          throw new Error(payload && payload.error ? payload.error : 'Unexpected response from backend')
+        const payload =
+          await jsonp({
+            action: 'list'
+          })
+
+        if (
+          !payload ||
+          payload.ok !== true ||
+          !Array.isArray(payload.entries)
+        ) {
+          throw new Error(
+            payload && payload.error
+              ? payload.error
+              : 'Unexpected response from backend'
+          )
         }
 
         return payload.entries
@@ -825,356 +1053,1098 @@
             mood: Number(item.mood),
             notes: String(item.notes || '')
           }))
-          .filter(item => Number.isFinite(item.epochMs) && Number.isFinite(item.mood))
-          .sort((a, b) => a.epochMs - b.epochMs)
+          .filter(item =>
+            Number.isFinite(item.epochMs) &&
+            Number.isFinite(item.mood)
+          )
+          .sort(
+            (a, b) =>
+              a.epochMs - b.epochMs
+          )
+      }
+
+      async function loadEntries({
+        preserveSelection = true
+      } = {}) {
+        if (!backendReady()) {
+          setDataState(
+            'offline',
+            'Setup required'
+          )
+
+          els.notesList.innerHTML =
+            '<div class="loading-row">Add the Apps Script web-app URL in the HTML to connect Mmood</div>'
+
+          return
+        }
+
+        setDataState(
+          'loading',
+          'Loading…'
+        )
+
+        try {
+          const previousSelection =
+            preserveSelection
+              ? state.selectedId
+              : null
+
+          state.entries =
+            await fetchEntries()
+
+          state.selectedId =
+            previousSelection
+
+          applyRange()
+
+          setDataState(
+            'live',
+            'LIVE data'
+          )
+        } catch (error) {
+          console.error(error)
+
+          setDataState(
+            'offline',
+            'Unavailable'
+          )
+
+          els.notesList.innerHTML =
+            '<div class="loading-row">Could not load entries</div>'
+
+          setFormStatus(
+            error.message ||
+              'Could not load entries',
+            'error'
+          )
+        }
       }
 
       function getRangeStart() {
-        if (state.range === 'all') return -Infinity;
-        const days = Number(state.range);
-        const now = Date.now();
-        return now - days * 24 * 60 * 60 * 1000;
+        if (state.range === 'all') {
+          return -Infinity
+        }
+
+        const days =
+          Number(state.range)
+
+        return (
+          Date.now() -
+          days * 24 * 60 * 60 * 1000
+        )
       }
 
       function captureNotePositions() {
-        const positions = new Map();
-        els.notesList.querySelectorAll('.note-item').forEach(item => {
-          positions.set(item.dataset.id, item.getBoundingClientRect());
-        });
-        return positions;
+        const positions =
+          new Map()
+
+        els.notesList
+          .querySelectorAll('.note-item')
+          .forEach(item => {
+            positions.set(
+              item.dataset.id,
+              item.getBoundingClientRect()
+            )
+          })
+
+        return positions
       }
 
       function playNoteFlip(firstPositions) {
-        if (!firstPositions || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        if (
+          !firstPositions ||
+          window
+            .matchMedia(
+              '(prefers-reduced-motion: reduce)'
+            )
+            .matches
+        ) {
+          return
+        }
 
-        const items = Array.from(els.notesList.querySelectorAll('.note-item'));
+        const items =
+          Array.from(
+            els.notesList
+              .querySelectorAll('.note-item')
+          )
+
         items.forEach(item => {
-          const first = firstPositions.get(item.dataset.id);
-          const last = item.getBoundingClientRect();
+          const first =
+            firstPositions.get(
+              item.dataset.id
+            )
+
+          const last =
+            item.getBoundingClientRect()
 
           if (first) {
-            const dx = first.left - last.left;
-            const dy = first.top - last.top;
-            if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
+            const dx =
+              first.left - last.left
+
+            const dy =
+              first.top - last.top
+
+            if (
+              Math.abs(dx) > 0.5 ||
+              Math.abs(dy) > 0.5
+            ) {
               item.animate(
                 [
-                  { transform: `translate(${dx}px, ${dy}px)` },
-                  { transform: 'translate(0, 0)' }
+                  {
+                    transform:
+                      `translate(${dx}px, ${dy}px)`
+                  },
+                  {
+                    transform:
+                      'translate(0, 0)'
+                  }
                 ],
-                { duration: FLIP_DURATION_MS, easing: FLIP_EASING }
-              );
+                {
+                  duration:
+                    FLIP_DURATION_MS,
+
+                  easing:
+                    FLIP_EASING
+                }
+              )
             }
           } else {
             item.animate(
               [
-                { opacity: 0, transform: 'translateY(-5px)' },
-                { opacity: 1, transform: 'translateY(0)' }
+                {
+                  opacity: 0,
+                  transform:
+                    'translateY(-5px)'
+                },
+                {
+                  opacity: 1,
+                  transform:
+                    'translateY(0)'
+                }
               ],
-              { duration: 130, easing: FLIP_EASING }
-            );
+              {
+                duration: 130,
+                easing: FLIP_EASING
+              }
+            )
           }
-        });
+        })
       }
 
       function applyRange() {
-        state.pendingNotePositions = captureNotePositions();
-        const start = getRangeStart();
-        state.filteredEntries = state.entries.filter(entry => entry.epochMs >= start);
+        state.pendingNotePositions =
+          captureNotePositions()
 
-        if (!state.filteredEntries.some(entry => entry.id === state.selectedId)) {
-          state.selectedId = state.filteredEntries.length
-            ? state.filteredEntries[state.filteredEntries.length - 1].id
-            : null;
+        const start =
+          getRangeStart()
+
+        state.filteredEntries =
+          state.entries.filter(
+            entry =>
+              entry.epochMs >= start
+          )
+
+        if (
+          !state.filteredEntries
+            .some(
+              entry =>
+                entry.id ===
+                state.selectedId
+            )
+        ) {
+          state.selectedId =
+            state.filteredEntries.length
+              ? state.filteredEntries[
+                  state.filteredEntries.length - 1
+                ].id
+              : null
         }
 
-        renderAll();
+        renderAll()
       }
 
       function renderAll() {
-        renderChart();
-        renderNotes();
-        renderSummary();
+        renderChart()
+        renderNotes()
+        renderSummary()
       }
 
       function renderSummary() {
-        const items = state.filteredEntries;
+        const items =
+          state.filteredEntries
 
         if (!items.length) {
-          els.summaryRow.innerHTML = '';
-          return;
+          els.summaryRow.innerHTML = ''
+          return
         }
 
-        const mean = items.reduce((sum, item) => sum + item.mood, 0) / items.length;
-        const latest = items[items.length - 1];
+        const mean =
+          items.reduce(
+            (sum, item) =>
+              sum + item.mood,
+            0
+          ) / items.length
+
+        const latest =
+          items[items.length - 1]
 
         els.summaryRow.innerHTML = [
-          '<span><strong>' + items.length + '</strong> entr' + (items.length === 1 ? 'y' : 'ies') + '</span>',
-          '<span>Average <strong>' + mean.toFixed(1) + '</strong></span>',
-          '<span>Latest <strong>' + latest.mood + '/10</strong></span>'
-        ].join('');
+          '<span><strong>' +
+            items.length +
+            '</strong> entr' +
+            (
+              items.length === 1
+                ? 'y'
+                : 'ies'
+            ) +
+            '</span>',
+
+          '<span>Average <strong>' +
+            mean.toFixed(1) +
+            '</strong></span>',
+
+          '<span>Latest <strong>' +
+            latest.mood +
+            '/10</strong></span>'
+        ].join('')
       }
 
+      /*
+       * Custom x-axis tick marks
+       *
+       * Major ticks:
+       * darker and longer
+       *
+       * Minor ticks:
+       * shorter and lighter
+       *
+       * The interval adapts to the visible time span
+       */
+      const mmoodAxisTicksPlugin = {
+        id: 'mmoodAxisTicks',
+
+        afterDraw(chart) {
+          const x =
+            chart.scales.x
+
+          if (!x) {
+            return
+          }
+
+          const ctx =
+            chart.ctx
+
+          const min =
+            x.min
+
+          const max =
+            x.max
+
+          if (
+            !Number.isFinite(min) ||
+            !Number.isFinite(max)
+          ) {
+            return
+          }
+
+          const span =
+            max - min
+
+          const DAY =
+            24 * 60 * 60 * 1000
+
+          let minorStep
+          let majorEvery
+
+          if (span <= 8 * DAY) {
+            minorStep =
+              6 * 60 * 60 * 1000
+
+            majorEvery = 4
+          } else if (
+            span <= 35 * DAY
+          ) {
+            minorStep = DAY
+            majorEvery = 7
+          } else if (
+            span <= 100 * DAY
+          ) {
+            minorStep =
+              7 * DAY
+
+            majorEvery = 2
+          } else {
+            minorStep =
+              7 * DAY
+
+            majorEvery = 4
+          }
+
+          const first =
+            Math.ceil(min / minorStep) *
+            minorStep
+
+          const axisY =
+            x.bottom
+
+          ctx.save()
+
+          let index = 0
+
+          for (
+            let t = first;
+            t <= max;
+            t += minorStep
+          ) {
+            const px =
+              x.getPixelForValue(t)
+
+            if (
+              px < x.left - 1 ||
+              px > x.right + 1
+            ) {
+              continue
+            }
+
+            const major =
+              index % majorEvery === 0
+
+            ctx.beginPath()
+
+            ctx.moveTo(
+              Math.round(px) + 0.5,
+              axisY
+            )
+
+            ctx.lineTo(
+              Math.round(px) + 0.5,
+              axisY +
+                (
+                  major
+                    ? 6
+                    : 3
+                )
+            )
+
+            ctx.strokeStyle =
+              major
+                ? '#151515'
+                : '#aeb4c0'
+
+            ctx.lineWidth =
+              major
+                ? 1
+                : 0.8
+
+            ctx.stroke()
+
+            index++
+          }
+
+          ctx.restore()
+        }
+      }
+
+      Chart.register(
+        mmoodAxisTicksPlugin
+      )
+
       function renderChart() {
-        const points = state.filteredEntries.map(entry => ({
-          x: entry.epochMs,
-          y: entry.mood,
-          id: entry.id
-        }));
+        const points =
+          state.filteredEntries.map(
+            entry => ({
+              x: entry.epochMs,
+              y: entry.mood,
+              id: entry.id
+            })
+          )
 
-        els.chartShell.classList.toggle('is-empty', points.length === 0);
+        els.chartShell.classList.toggle(
+          'is-empty',
+          points.length === 0
+        )
 
-        const selectedIndex = state.filteredEntries.findIndex(entry => entry.id === state.selectedId);
-        const pointRadius = points.map((_, index) => index === selectedIndex ? 6 : 3.5);
-        const pointBorderWidth = points.map((_, index) => index === selectedIndex ? 2 : 1);
+        const selectedIndex =
+          state.filteredEntries
+            .findIndex(
+              entry =>
+                entry.id ===
+                state.selectedId
+            )
+
+        const pointRadius =
+          points.map(
+            (_, index) =>
+              index === selectedIndex
+                ? 6
+                : 3.5
+          )
+
+        const pointBorderWidth =
+          points.map(
+            (_, index) =>
+              index === selectedIndex
+                ? 2
+                : 1
+          )
 
         if (state.chart) {
-          state.chart.data.datasets[0].data = points;
-          state.chart.data.datasets[0].pointRadius = pointRadius;
-          state.chart.data.datasets[0].pointBorderWidth = pointBorderWidth;
-          state.chart.update('none');
-          return;
+          state.chart
+            .data
+            .datasets[0]
+            .data = points
+
+          state.chart
+            .data
+            .datasets[0]
+            .pointRadius =
+              pointRadius
+
+          state.chart
+            .data
+            .datasets[0]
+            .pointBorderWidth =
+              pointBorderWidth
+
+          state.chart.update()
+          return
         }
 
-        state.chart = new Chart(els.moodChart, {
-          type: 'line',
-          data: {
-            datasets: [{
-              label: 'Mood',
-              data: points,
-              parsing: false,
-              borderColor: '#0b2f5b',
-              backgroundColor: '#0b2f5b',
-              pointBackgroundColor: '#ffffff',
-              pointBorderColor: '#0b2f5b',
-              pointRadius,
-              pointHoverRadius: 6,
-              pointBorderWidth,
-              borderWidth: 2,
-              tension: 0.22,
-              spanGaps: true
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            normalized: true,
-            animation: {
-              duration: 180,
-              easing: 'easeOutQuart'
-            },
-            interaction: {
-              mode: 'nearest',
-              axis: 'xy',
-              intersect: false
-            },
-            onClick: (_event, elements) => {
-              if (!elements.length) return;
-              const index = elements[0].index;
-              const entry = state.filteredEntries[index];
-              if (entry) selectEntry(entry.id, true);
-            },
-            onHover: (_event, elements) => {
-              if (!elements.length) return;
-              const index = elements[0].index;
-              const entry = state.filteredEntries[index];
-              if (entry && entry.id !== state.selectedId) {
-                selectEntry(entry.id, true, false);
-              }
-            },
-            plugins: {
-              legend: {
-                display: false
+        state.chart =
+          new Chart(
+            els.moodChart,
+            {
+              type: 'line',
+
+              data: {
+                datasets: [
+                  {
+                    label: 'Mood',
+
+                    data: points,
+
+                    parsing: false,
+
+                    borderColor:
+                      '#0b2f5b',
+
+                    backgroundColor:
+                      '#0b2f5b',
+
+                    pointBackgroundColor:
+                      '#ffffff',
+
+                    pointBorderColor:
+                      '#0b2f5b',
+
+                    pointRadius,
+
+                    pointHoverRadius: 6,
+
+                    pointBorderWidth,
+
+                    borderWidth: 2,
+
+                    tension: 0.22,
+
+                    spanGaps: true
+                  }
+                ]
               },
-              tooltip: {
-                displayColors: false,
-                callbacks: {
-                  title: items => {
-                    if (!items.length) return '';
-                    const entry = state.filteredEntries[items[0].dataIndex];
-                    return entry ? formatDateTime(entry.timestamp) : '';
+
+              options: {
+                responsive: true,
+
+                maintainAspectRatio:
+                  false,
+
+                normalized: true,
+
+                animation: {
+                  duration: 170,
+                  easing:
+                    'easeOutQuart'
+                },
+
+                interaction: {
+                  mode: 'nearest',
+                  axis: 'xy',
+                  intersect: false
+                },
+
+                onClick: (
+                  _event,
+                  elements
+                ) => {
+                  if (
+                    !elements.length
+                  ) {
+                    return
+                  }
+
+                  const index =
+                    elements[0].index
+
+                  const entry =
+                    state.filteredEntries[
+                      index
+                    ]
+
+                  if (entry) {
+                    selectEntry(
+                      entry.id,
+                      true
+                    )
+                  }
+                },
+
+                onHover: (
+                  _event,
+                  elements
+                ) => {
+                  if (
+                    !elements.length
+                  ) {
+                    return
+                  }
+
+                  const index =
+                    elements[0].index
+
+                  const entry =
+                    state.filteredEntries[
+                      index
+                    ]
+
+                  if (
+                    entry &&
+                    entry.id !==
+                      state.selectedId
+                  ) {
+                    selectEntry(
+                      entry.id,
+                      true,
+                      false
+                    )
+                  }
+                },
+
+                plugins: {
+                  legend: {
+                    display: false
                   },
-                  label: context => 'Mood: ' + context.parsed.y + '/10',
-                  afterLabel: context => {
-                    const entry = state.filteredEntries[context.dataIndex];
-                    if (!entry || !entry.notes) return '';
-                    return entry.notes.length > 90 ? entry.notes.slice(0, 87) + '…' : entry.notes;
+
+                  tooltip: {
+                    displayColors: false,
+
+                    callbacks: {
+                      title: items => {
+                        if (
+                          !items.length
+                        ) {
+                          return ''
+                        }
+
+                        const entry =
+                          state.filteredEntries[
+                            items[0]
+                              .dataIndex
+                          ]
+
+                        return entry
+                          ? formatDateTime(
+                              entry.timestamp
+                            )
+                          : ''
+                      },
+
+                      label:
+                        context =>
+                          'Mood: ' +
+                          context
+                            .parsed
+                            .y +
+                          '/10',
+
+                      afterLabel:
+                        context => {
+                          const entry =
+                            state.filteredEntries[
+                              context
+                                .dataIndex
+                            ]
+
+                          if (
+                            !entry ||
+                            !entry.notes
+                          ) {
+                            return ''
+                          }
+
+                          return (
+                            entry.notes
+                              .length > 90
+                              ? entry.notes
+                                  .slice(
+                                    0,
+                                    87
+                                  ) +
+                                '…'
+                              : entry.notes
+                          )
+                        }
+                    }
                   }
-                }
-              }
-            },
-            scales: {
-              x: {
-                type: 'time',
-                time: {
-                  tooltipFormat: 'd MMM yyyy, h:mm a',
-                  displayFormats: {
-                    hour: 'd MMM',
-                    day: 'd MMM',
-                    week: 'd MMM',
-                    month: 'MMM yyyy'
+                },
+
+                layout: {
+                  padding: {
+                    bottom: 6
                   }
                 },
-                grid: {
-                  display: false
-                },
-                border: {
-                  color: '#151515'
-                },
-                ticks: {
-                  color: '#69718a',
-                  maxRotation: 0,
-                  autoSkip: true,
-                  maxTicksLimit: 6,
-                  callback: value => {
-                    const d = new Date(value);
-                    if (Number.isNaN(d.getTime())) return '';
-                    d.setMinutes(d.getMinutes() >= 30 ? 60 : 0, 0, 0);
-                    return new Intl.DateTimeFormat('en-AU', {
-                      day: 'numeric',
-                      month: 'short',
-                      hour: 'numeric',
-                      hour12: true
-                    }).format(d);
+
+                scales: {
+                  x: {
+                    type: 'time',
+
+                    time: {
+                      tooltipFormat:
+                        'd MMM yyyy, h:mm a',
+
+                      displayFormats: {
+                        hour:
+                          'd MMM h a',
+
+                        day:
+                          'd MMM',
+
+                        week:
+                          'd MMM',
+
+                        month:
+                          'MMM yyyy'
+                      }
+                    },
+
+                    grid: {
+                      display: false,
+                      drawTicks: false
+                    },
+
+                    border: {
+                      display: true,
+                      color: '#151515',
+                      width: 1
+                    },
+
+                    ticks: {
+                      color: '#69718a',
+
+                      padding: 7,
+
+                      maxRotation: 0,
+
+                      autoSkip: true,
+
+                      maxTicksLimit: 6,
+
+                      callback:
+                        value =>
+                          formatRoundedHour(
+                            value
+                          ),
+
+                      font: {
+                        family: 'Lato',
+                        size: 10
+                      }
+                    }
                   },
-                  font: {
-                    family: 'Lato',
-                    size: 10
+
+                  y: {
+                    min: 1,
+                    max: 10,
+
+                    ticks: {
+                      stepSize: 1,
+
+                      color:
+                        '#69718a',
+
+                      font: {
+                        family:
+                          'Lato',
+
+                        size: 10
+                      }
+                    },
+
+                    grid: {
+                      color:
+                        '#e8eaf0',
+
+                      lineWidth: 1
+                    },
+
+                    border: {
+                      display: true,
+
+                      color:
+                        '#151515',
+
+                      width: 1
+                    }
                   }
-                }
-              },
-              y: {
-                min: 1,
-                max: 10,
-                ticks: {
-                  stepSize: 1,
-                  color: '#69718a',
-                  font: {
-                    family: 'Lato',
-                    size: 10
-                  }
-                },
-                grid: {
-                  color: '#e8eaf0'
-                },
-                border: {
-                  color: '#151515'
                 }
               }
             }
-          }
-        });
+          )
       }
 
       function renderNotes() {
-        const items = [...state.filteredEntries].reverse();
-        els.notesCount.textContent = items.length ? items.length + ' shown' : '';
+        /*
+         * Only entries containing actual
+         * note text appear here
+         *
+         * Blank-note mood entries remain
+         * on the graph
+         */
+        const items =
+          [...state.filteredEntries]
+            .filter(
+              entry =>
+                entry.notes
+                  .trim() !== ''
+            )
+            .reverse()
+
+        els.notesCount.textContent =
+          items.length
+            ? items.length +
+              ' shown'
+            : ''
 
         if (!items.length) {
-          els.notesList.innerHTML = '<div class="loading-row">No notes in this time range</div>';
-          state.pendingNotePositions = null;
-          return;
+          els.notesList.innerHTML =
+            '<div class="loading-row">No notes in this time range</div>'
+
+          state.pendingNotePositions =
+            null
+
+          return
         }
 
-        els.notesList.innerHTML = '';
+        els.notesList.innerHTML = ''
 
         items.forEach(entry => {
-          const button = document.createElement('button');
-          button.type = 'button';
-          button.className = 'note-item' + (entry.id === state.selectedId ? ' is-selected' : '');
-          button.dataset.id = entry.id;
-          button.setAttribute('aria-pressed', entry.id === state.selectedId ? 'true' : 'false');
+          const button =
+            document.createElement(
+              'button'
+            )
 
-          const meta = document.createElement('div');
-          meta.className = 'note-meta';
+          button.type = 'button'
 
-          const date = document.createElement('span');
-          date.className = 'note-date';
-          date.textContent = formatDateTime(entry.timestamp);
+          button.className =
+            'note-item' +
+            (
+              entry.id ===
+              state.selectedId
+                ? ' is-selected'
+                : ''
+            )
 
-          const score = document.createElement('span');
-          score.className = 'note-score';
-          score.textContent = entry.mood + '/10';
+          button.dataset.id =
+            entry.id
 
-          meta.append(date, score);
+          button.setAttribute(
+            'aria-pressed',
+            entry.id ===
+              state.selectedId
+              ? 'true'
+              : 'false'
+          )
 
-          const text = document.createElement('div');
-          text.className = 'note-text' + (entry.notes ? '' : ' is-empty');
-          text.textContent = entry.notes || 'No note';
+          const meta =
+            document.createElement(
+              'div'
+            )
 
-          button.append(meta, text);
-          button.addEventListener('click', () => selectEntry(entry.id, false));
-          els.notesList.appendChild(button);
-        });
+          meta.className =
+            'note-meta'
 
-        playNoteFlip(state.pendingNotePositions);
-        state.pendingNotePositions = null;
-        scrollSelectedNoteIntoView(false);
+          const date =
+            document.createElement(
+              'span'
+            )
+
+          date.className =
+            'note-date'
+
+          date.textContent =
+            formatDateTime(
+              entry.timestamp
+            )
+
+          const score =
+            document.createElement(
+              'span'
+            )
+
+          score.className =
+            'note-score'
+
+          score.textContent =
+            entry.mood + '/10'
+
+          meta.append(
+            date,
+            score
+          )
+
+          const text =
+            document.createElement(
+              'div'
+            )
+
+          text.className =
+            'note-text'
+
+          text.textContent =
+            entry.notes
+
+          button.append(
+            meta,
+            text
+          )
+
+          button.addEventListener(
+            'click',
+            () =>
+              selectEntry(
+                entry.id,
+                false
+              )
+          )
+
+          els.notesList
+            .appendChild(button)
+        })
+
+        playNoteFlip(
+          state.pendingNotePositions
+        )
+
+        state.pendingNotePositions =
+          null
+
+        scrollSelectedNoteIntoView(
+          false
+        )
       }
 
-      function selectEntry(id, scrollNote = true, chartUpdate = true) {
-        state.selectedId = String(id);
+      function selectEntry(
+        id,
+        scrollNote = true,
+        chartUpdate = true
+      ) {
+        state.selectedId =
+          String(id)
 
-        const buttons = els.notesList.querySelectorAll('.note-item');
+        const buttons =
+          els.notesList
+            .querySelectorAll(
+              '.note-item'
+            )
+
         buttons.forEach(button => {
-          const active = button.dataset.id === state.selectedId;
-          button.classList.toggle('is-selected', active);
-          button.setAttribute('aria-pressed', active ? 'true' : 'false');
-        });
+          const active =
+            button.dataset.id ===
+            state.selectedId
 
-        if (chartUpdate && state.chart) {
-          const selectedIndex = state.filteredEntries.findIndex(entry => entry.id === state.selectedId);
-          state.chart.data.datasets[0].pointRadius = state.filteredEntries.map((_, index) => index === selectedIndex ? 6 : 3.5);
-          state.chart.data.datasets[0].pointBorderWidth = state.filteredEntries.map((_, index) => index === selectedIndex ? 2 : 1);
-          state.chart.update('none');
+          button.classList.toggle(
+            'is-selected',
+            active
+          )
+
+          button.setAttribute(
+            'aria-pressed',
+            active
+              ? 'true'
+              : 'false'
+          )
+        })
+
+        if (
+          chartUpdate &&
+          state.chart
+        ) {
+          const selectedIndex =
+            state.filteredEntries
+              .findIndex(
+                entry =>
+                  entry.id ===
+                  state.selectedId
+              )
+
+          state.chart
+            .data
+            .datasets[0]
+            .pointRadius =
+              state.filteredEntries
+                .map(
+                  (_, index) =>
+                    index ===
+                    selectedIndex
+                      ? 6
+                      : 3.5
+                )
+
+          state.chart
+            .data
+            .datasets[0]
+            .pointBorderWidth =
+              state.filteredEntries
+                .map(
+                  (_, index) =>
+                    index ===
+                    selectedIndex
+                      ? 2
+                      : 1
+                )
+
+          state.chart.update(
+            'none'
+          )
         }
 
-        if (scrollNote) scrollSelectedNoteIntoView(true);
+        if (scrollNote) {
+          scrollSelectedNoteIntoView(
+            true
+          )
+        }
       }
 
-      function scrollSelectedNoteIntoView(smooth) {
-        if (!state.selectedId) return;
-        const item = els.notesList.querySelector('.note-item[data-id="' + CSS.escape(state.selectedId) + '"]');
-        if (!item) return;
+      function scrollSelectedNoteIntoView(
+        smooth
+      ) {
+        if (!state.selectedId) {
+          return
+        }
+
+        const item =
+          els.notesList
+            .querySelector(
+              '.note-item[data-id="' +
+                CSS.escape(
+                  state.selectedId
+                ) +
+                '"]'
+            )
+
+        /*
+         * An entry may legitimately
+         * have no note and therefore
+         * no matching note row
+         */
+        if (!item) {
+          return
+        }
 
         item.scrollIntoView({
           block: 'nearest',
-          behavior: smooth && !window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'smooth' : 'auto'
-        });
+
+          behavior:
+            smooth &&
+            !window
+              .matchMedia(
+                '(prefers-reduced-motion: reduce)'
+              )
+              .matches
+              ? 'smooth'
+              : 'auto'
+        })
       }
 
       function getSelectedMood() {
-        const checked = document.querySelector('input[name="mood"]:checked');
-        return checked ? Number(checked.value) : null;
+        const checked =
+          document.querySelector(
+            'input[name="mood"]:checked'
+          )
+
+        return checked
+          ? Number(
+              checked.value
+            )
+          : null
       }
 
       function submitEntry() {
-        const mood = getSelectedMood()
-        const notes = els.notes.value.trim()
+        const mood =
+          getSelectedMood()
+
+        const notes =
+          els.notes.value.trim()
 
         if (!mood) {
-          setFormStatus('Choose a mood score from 1 to 10', 'error')
+          setFormStatus(
+            'Choose a mood score from 1 to 10',
+            'error'
+          )
+
           return
         }
 
         if (!backendReady()) {
-          setFormStatus('Add your deployed Apps Script URL to CONFIG.backendUrl first', 'error')
+          setFormStatus(
+            'Add your deployed Apps Script URL to CONFIG.backendUrl first',
+            'error'
+          )
+
           return
         }
 
-        const beforeIds = new Set(state.entries.map(entry => entry.id))
-        const startedAt = Date.now()
-        state.pendingSave = { mood, notes, beforeIds, startedAt }
+        const beforeIds =
+          new Set(
+            state.entries.map(
+              entry => entry.id
+            )
+          )
 
-        els.saveButton.disabled = true
-        els.saveButton.textContent = 'Saving…'
-        setDataState('saving', 'Saving…')
+        const startedAt =
+          Date.now()
+
+        state.pendingSave = {
+          mood,
+          notes,
+          beforeIds,
+          startedAt
+        }
+
+        els.saveButton.disabled =
+          true
+
+        els.saveButton.textContent =
+          'Saving…'
+
+        setDataState(
+          'saving',
+          'Saving…'
+        )
+
         setFormStatus('')
 
-        const form = document.createElement('form')
+        const form =
+          document.createElement(
+            'form'
+          )
+
         form.method = 'POST'
-        form.action = CONFIG.backendUrl
-        form.target = 'mmoodSaveFrame'
-        form.style.display = 'none'
+        form.action =
+          CONFIG.backendUrl
+        form.target =
+          'mmoodSaveFrame'
+        form.style.display =
+          'none'
 
         const fields = {
           action: 'add',
@@ -1182,100 +2152,231 @@
           notes
         }
 
-        Object.entries(fields).forEach(([name, value]) => {
-          const input = document.createElement('input')
-          input.type = 'hidden'
-          input.name = name
-          input.value = value
-          form.appendChild(input)
-        })
+        Object.entries(fields)
+          .forEach(
+            ([name, value]) => {
+              const input =
+                document.createElement(
+                  'input'
+                )
 
-        document.body.appendChild(form)
+              input.type =
+                'hidden'
+
+              input.name =
+                name
+
+              input.value =
+                value
+
+              form.appendChild(
+                input
+              )
+            }
+          )
+
+        document.body.appendChild(
+          form
+        )
+
         form.submit()
         form.remove()
-
       }
 
       async function confirmSavedFromFrame() {
-        const pending = state.pendingSave
-        if (!pending) return
+        const pending =
+          state.pendingSave
 
-        let matchedEntry = null
+        if (!pending) {
+          return
+        }
+
+        let matchedEntry =
+          null
 
         try {
-          const entries = await fetchEntries()
-          matchedEntry = [...entries].reverse().find(entry =>
-            !pending.beforeIds.has(entry.id) &&
-            entry.mood === pending.mood &&
-            entry.notes === pending.notes &&
-            entry.epochMs >= pending.startedAt - 5000
-          ) || null
+          const entries =
+            await fetchEntries()
 
-          state.entries = entries
+          matchedEntry =
+            [...entries]
+              .reverse()
+              .find(
+                entry =>
+                  !pending
+                    .beforeIds
+                    .has(
+                      entry.id
+                    ) &&
+
+                  entry.mood ===
+                    pending.mood &&
+
+                  entry.notes ===
+                    pending.notes &&
+
+                  entry.epochMs >=
+                    pending
+                      .startedAt -
+                      5000
+              ) || null
+
+          state.entries =
+            entries
         } catch (error) {
           console.error(error)
         }
 
-        state.pendingSave = null
-        finishSaveSuccess(matchedEntry)
+        state.pendingSave =
+          null
 
+        finishSaveSuccess(
+          matchedEntry
+        )
+
+        /*
+         * If Apps Script finished the
+         * POST before the Sheet list
+         * endpoint reflected the new row,
+         * refresh again shortly afterward
+         *
+         * This is not treated as an error
+         */
         if (!matchedEntry) {
-          window.setTimeout(() => {
-            loadEntries({ preserveSelection: false })
-          }, CONFIG.saveRefreshDelayMs)
+          window.setTimeout(
+            () => {
+              loadEntries({
+                preserveSelection:
+                  false
+              })
+            },
+            CONFIG
+              .saveRefreshDelayMs
+          )
         }
       }
 
-      function finishSaveSuccess(newEntry) {
-        els.saveButton.disabled = false
-        els.saveButton.textContent = 'Save entry'
-        setDataState('live', 'LIVE data')
-        setFormStatus('Saved ' + formatDateTime(newEntry ? newEntry.timestamp : new Date()), 'success')
+      function finishSaveSuccess(
+        newEntry
+      ) {
+        els.saveButton.disabled =
+          false
 
-        document.querySelectorAll('input[name="mood"]').forEach(input => {
-          input.checked = false
-        })
+        els.saveButton.textContent =
+          'Save entry'
+
+        setDataState(
+          'live',
+          'LIVE data'
+        )
+
+        setFormStatus(
+          'Saved ' +
+            formatDateTime(
+              newEntry
+                ? newEntry.timestamp
+                : new Date()
+            ),
+          'success'
+        )
+
+        document
+          .querySelectorAll(
+            'input[name="mood"]'
+          )
+          .forEach(input => {
+            input.checked =
+              false
+          })
+
         els.notes.value = ''
+
         updateTimestampPreview()
 
-        if (newEntry && newEntry.id) {
-          state.selectedId = String(newEntry.id)
+        if (
+          newEntry &&
+          newEntry.id
+        ) {
+          state.selectedId =
+            String(
+              newEntry.id
+            )
+
           applyRange()
-          selectEntry(String(newEntry.id), true)
+
+          selectEntry(
+            String(
+              newEntry.id
+            ),
+            true
+          )
         } else {
           applyRange()
         }
       }
 
-      els.saveFrame.addEventListener('load', () => {
-        if (state.pendingSave) {
-          confirmSavedFromFrame()
+      els.saveFrame.addEventListener(
+        'load',
+        () => {
+          if (
+            state.pendingSave
+          ) {
+            confirmSavedFromFrame()
+          }
         }
+      )
+
+      els.entryForm.addEventListener(
+        'submit',
+        event => {
+          event.preventDefault()
+          submitEntry()
+        }
+      )
+
+      els.rangeTabs.forEach(
+        button => {
+          button.addEventListener(
+            'click',
+            () => {
+              state.range =
+                button.dataset.range
+
+              els.rangeTabs
+                .forEach(tab => {
+                  const active =
+                    tab === button
+
+                  tab.classList.toggle(
+                    'is-active',
+                    active
+                  )
+
+                  tab.setAttribute(
+                    'aria-selected',
+                    active
+                      ? 'true'
+                      : 'false'
+                  )
+                })
+
+              applyRange()
+            }
+          )
+        }
+      )
+
+      updateTimestampPreview()
+
+      window.setInterval(
+        updateTimestampPreview,
+        30000
+      )
+
+      loadEntries({
+        preserveSelection: false
       })
-
-      els.entryForm.addEventListener('submit', event => {
-        event.preventDefault();
-        submitEntry();
-      });
-
-      els.rangeTabs.forEach(button => {
-        button.addEventListener('click', () => {
-          state.range = button.dataset.range;
-
-          els.rangeTabs.forEach(tab => {
-            const active = tab === button;
-            tab.classList.toggle('is-active', active);
-            tab.setAttribute('aria-selected', active ? 'true' : 'false');
-          });
-
-          applyRange();
-        });
-      });
-
-      updateTimestampPreview();
-      window.setInterval(updateTimestampPreview, 30000);
-      loadEntries({ preserveSelection: false });
-    })();
+    })()
   </script>
 </body>
 </html>
