@@ -13,15 +13,15 @@
 
   <style>
     :root {
-      --pff-purple: #6600ff;
-      --pff-ink: #151515;
-      --pff-muted: #69718a;
-      --pff-track: #e8eaf0;
-      --pff-error: #b42318;
-      --pff-positive: #14823b;
-      --pff-white: #ffffff;
-      --pff-soft: #f8f8fb;
-      --pff-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+      --mmood-blue: #0b2f5b;
+      --mmood-ink: #151515;
+      --mmood-muted: #69718a;
+      --mmood-track: #e8eaf0;
+      --mmood-error: #b42318;
+      --mmood-positive: #14823b;
+      --mmood-white: #ffffff;
+      --mmood-soft: #f8f8fb;
+      --mmood-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
       --app-max-width: 780px;
     }
 
@@ -33,11 +33,11 @@
     body {
       margin: 0;
       padding: 0;
-      background: var(--pff-white);
+      background: var(--mmood-white);
     }
 
     body {
-      color: var(--pff-ink);
+      color: var(--mmood-ink);
       font-family: 'Lato', sans-serif;
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
@@ -85,18 +85,12 @@
     }
 
     h1 {
-      color: var(--pff-ink);
+      color: var(--mmood-ink);
       font-size: 25px;
       font-weight: 400;
       line-height: 1.1;
     }
 
-    .subtitle {
-      margin-top: 4px;
-      color: var(--pff-muted);
-      font-size: 13px;
-      line-height: 1.3;
-    }
 
     .data-state {
       display: inline-flex;
@@ -104,7 +98,7 @@
       align-items: center;
       gap: 5px;
       min-height: 20px;
-      color: var(--pff-muted);
+      color: var(--mmood-muted);
       font-size: 11px;
       line-height: 1;
       white-space: nowrap;
@@ -114,7 +108,7 @@
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: var(--pff-muted);
+      background: var(--mmood-muted);
     }
 
     .data-state.is-live .data-state-dot {
@@ -130,9 +124,9 @@
       margin: 10px 0 16px;
       background: linear-gradient(
         90deg,
-        var(--pff-white) 0%,
-        var(--pff-purple) 50%,
-        var(--pff-white) 100%
+        var(--mmood-white) 0%,
+        var(--mmood-blue) 50%,
+        var(--mmood-white) 100%
       );
     }
 
@@ -143,7 +137,7 @@
 
     .field-label,
     .section-kicker {
-      color: var(--pff-muted);
+      color: var(--mmood-muted);
       font-size: 12px;
       font-weight: 700;
       letter-spacing: 0.02em;
@@ -174,9 +168,9 @@
       min-height: 42px;
       align-items: center;
       justify-content: center;
-      color: var(--pff-muted);
-      background: var(--pff-white);
-      border: 1px solid var(--pff-track);
+      color: var(--mmood-muted);
+      background: var(--mmood-white);
+      border: 1px solid var(--mmood-track);
       border-radius: 6px;
       cursor: pointer;
       font-size: 15px;
@@ -188,25 +182,25 @@
     }
 
     .mood-option input:checked + label {
-      color: var(--pff-white);
-      background: var(--pff-purple);
-      border-color: var(--pff-purple);
+      color: var(--mmood-white);
+      background: var(--mmood-blue);
+      border-color: var(--mmood-blue);
     }
 
     .mood-option input:focus-visible + label {
-      outline: 2px solid var(--pff-purple);
+      outline: 2px solid var(--mmood-blue);
       outline-offset: 2px;
     }
 
     @media (hover: hover) and (pointer: fine) {
       .mood-option label:hover {
-        color: var(--pff-purple);
-        border-color: var(--pff-purple);
+        color: var(--mmood-blue);
+        border-color: var(--mmood-blue);
         transform: translateY(-1px);
       }
 
       .mood-option input:checked + label:hover {
-        color: var(--pff-white);
+        color: var(--mmood-white);
       }
     }
 
@@ -216,9 +210,9 @@
       min-height: 84px;
       resize: vertical;
       padding: 10px 11px;
-      color: var(--pff-ink);
-      background: var(--pff-white);
-      border: 1px solid var(--pff-track);
+      color: var(--mmood-ink);
+      background: var(--mmood-white);
+      border: 1px solid var(--mmood-track);
       border-radius: 6px;
       font-size: 16px;
       line-height: 1.45;
@@ -227,7 +221,7 @@
     }
 
     .notes-input:focus {
-      border-color: var(--pff-purple);
+      border-color: var(--mmood-blue);
     }
 
     .form-bottom {
@@ -238,7 +232,7 @@
     }
 
     .timestamp-preview {
-      color: var(--pff-muted);
+      color: var(--mmood-muted);
       font-size: 12px;
       line-height: 1.3;
     }
@@ -247,9 +241,9 @@
       min-width: 104px;
       min-height: 40px;
       padding: 0 16px;
-      color: var(--pff-white);
-      background: var(--pff-ink);
-      border: 1px solid var(--pff-ink);
+      color: var(--mmood-white);
+      background: var(--mmood-ink);
+      border: 1px solid var(--mmood-ink);
       border-radius: 6px;
       cursor: pointer;
       font-size: 14px;
@@ -262,8 +256,8 @@
 
     .save-button:hover,
     .save-button:focus-visible {
-      background: var(--pff-purple);
-      border-color: var(--pff-purple);
+      background: var(--mmood-blue);
+      border-color: var(--mmood-blue);
       outline: none;
     }
 
@@ -275,23 +269,23 @@
     .status {
       min-height: 18px;
       margin-top: 7px;
-      color: var(--pff-muted);
+      color: var(--mmood-muted);
       font-size: 12px;
       line-height: 1.35;
     }
 
     .status.is-error {
-      color: var(--pff-error);
+      color: var(--mmood-error);
     }
 
     .status.is-success {
-      color: var(--pff-positive);
+      color: var(--mmood-positive);
     }
 
     .history {
       margin-top: 20px;
       padding-top: 16px;
-      border-top: 1px solid var(--pff-track);
+      border-top: 1px solid var(--mmood-track);
     }
 
     .history-heading-row {
@@ -313,7 +307,7 @@
       align-items: center;
       gap: 2px;
       padding: 2px;
-      border: 1px solid var(--pff-track);
+      border: 1px solid var(--mmood-track);
       border-radius: 7px;
     }
 
@@ -321,7 +315,7 @@
       min-width: 42px;
       min-height: 30px;
       padding: 0 8px;
-      color: var(--pff-muted);
+      color: var(--mmood-muted);
       background: transparent;
       border: 0;
       border-radius: 5px;
@@ -331,12 +325,12 @@
     }
 
     .range-tab.is-active {
-      color: var(--pff-purple);
-      background: #f3edff;
+      color: var(--mmood-blue);
+      background: #eaf1f8;
     }
 
     .range-tab:focus-visible {
-      outline: 2px solid var(--pff-purple);
+      outline: 2px solid var(--mmood-blue);
       outline-offset: 1px;
     }
 
@@ -372,7 +366,7 @@
       align-items: center;
       justify-content: center;
       padding: 24px;
-      color: var(--pff-muted);
+      color: var(--mmood-muted);
       font-size: 13px;
       text-align: center;
     }
@@ -385,7 +379,7 @@
       display: flex;
       min-height: 0;
       flex-direction: column;
-      border-left: 1px solid var(--pff-track);
+      border-left: 1px solid var(--mmood-track);
       padding-left: 12px;
     }
 
@@ -395,7 +389,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      color: var(--pff-muted);
+      color: var(--mmood-muted);
       font-size: 12px;
     }
 
@@ -415,29 +409,30 @@
     .note-item {
       width: 100%;
       padding: 9px 8px 10px;
-      color: var(--pff-ink);
+      color: var(--mmood-ink);
       background: transparent;
       border: 0;
-      border-bottom: 1px solid var(--pff-track);
+      border-bottom: 1px solid var(--mmood-track);
       border-radius: 0;
       cursor: pointer;
       text-align: left;
       transition:
-        background-color 160ms ease,
-        border-color 160ms ease;
+        background-color 110ms ease,
+        border-color 110ms ease;
+      will-change: transform;
     }
 
     .note-item:first-child {
-      border-top: 1px solid var(--pff-track);
+      border-top: 1px solid var(--mmood-track);
     }
 
     .note-item.is-selected {
-      background: #f7f2ff;
-      border-bottom-color: #dccaff;
+      background: #eef4fa;
+      border-bottom-color: #bfd1e3;
     }
 
     .note-item:focus-visible {
-      outline: 2px solid var(--pff-purple);
+      outline: 2px solid var(--mmood-blue);
       outline-offset: -2px;
     }
 
@@ -451,20 +446,20 @@
 
     .note-date {
       min-width: 0;
-      color: var(--pff-muted);
+      color: var(--mmood-muted);
       font-size: 11px;
       line-height: 1.25;
     }
 
     .note-score {
       flex: 0 0 auto;
-      color: var(--pff-purple);
+      color: var(--mmood-blue);
       font-size: 14px;
       font-weight: 700;
     }
 
     .note-text {
-      color: var(--pff-ink);
+      color: var(--mmood-ink);
       font-size: 13px;
       line-height: 1.38;
       white-space: pre-wrap;
@@ -472,13 +467,13 @@
     }
 
     .note-text.is-empty {
-      color: var(--pff-muted);
+      color: var(--mmood-muted);
       font-style: italic;
     }
 
     .loading-row {
       padding: 18px 8px;
-      color: var(--pff-muted);
+      color: var(--mmood-muted);
       font-size: 12px;
       text-align: center;
     }
@@ -488,12 +483,12 @@
       flex-wrap: wrap;
       gap: 12px 22px;
       margin-top: 10px;
-      color: var(--pff-muted);
+      color: var(--mmood-muted);
       font-size: 11px;
     }
 
     .summary-row strong {
-      color: var(--pff-ink);
+      color: var(--mmood-ink);
       font-weight: 700;
     }
 
@@ -554,7 +549,7 @@
       }
 
       .notes-panel {
-        border-top: 1px solid var(--pff-track);
+        border-top: 1px solid var(--mmood-track);
         border-left: 0;
         padding-top: 8px;
         padding-left: 0;
@@ -598,7 +593,6 @@
       <header class="app-header">
         <div class="app-title-wrap">
           <h1>Mmood</h1>
-          <p class="subtitle">A simple record of how you’re feeling over time.</p>
         </div>
 
         <div id="dataState" class="data-state" aria-live="polite">
@@ -640,7 +634,7 @@
 
         <div>
           <div class="form-bottom">
-            <div id="timestampPreview" class="timestamp-preview">Date and time are saved automatically.</div>
+            <div id="timestampPreview" class="timestamp-preview">Date and time are saved automatically</div>
             <button id="saveButton" class="save-button" type="submit">Save entry</button>
           </div>
           <div id="formStatus" class="status" role="status" aria-live="polite"></div>
@@ -663,7 +657,7 @@
           <div class="chart-panel">
             <div id="chartShell" class="chart-shell">
               <canvas id="moodChart" aria-label="Mood score over time"></canvas>
-              <div class="empty-state">No entries in this time range yet.</div>
+              <div class="empty-state">No entries in this time range yet</div>
             </div>
 
             <div id="summaryRow" class="summary-row" aria-live="polite"></div>
@@ -690,13 +684,17 @@
     (() => {
       'use strict';
 
+      const FLIP_DURATION_MS = 170;
+      const FLIP_EASING = 'cubic-bezier(0.22, 1, 0.36, 1)';
+
       const CONFIG = Object.freeze({
         // STEP 1 AFTER DEPLOYING Code.gs:
         // Replace this placeholder with your Apps Script /exec web-app URL.
         backendUrl: 'https://script.google.com/macros/s/AKfycbyVAVwOpdCbvwFe9jzOee0nk1v8mkafTChAuu15Dn81TyDADDEnRmI8LtP-U-qUhukgsA/exec',
         defaultRangeDays: 30,
         jsonpTimeoutMs: 20000,
-        saveTimeoutMs: 20000
+        saveVerifyDelayMs: 900,
+        saveVerifyAttempts: 5
       });
 
       const state = {
@@ -705,8 +703,9 @@
         selectedId: null,
         range: String(CONFIG.defaultRangeDays),
         chart: null,
-        saveTimer: null,
-        callbackCounter: 0
+        pendingSave: null,
+        callbackCounter: 0,
+        pendingNotePositions: null
       };
 
       const els = {
@@ -761,7 +760,7 @@
       function jsonp(params) {
         return new Promise((resolve, reject) => {
           if (!backendReady()) {
-            reject(new Error('Add your Apps Script web-app URL to CONFIG.backendUrl first.'));
+            reject(new Error('Add your Apps Script web-app URL to CONFIG.backendUrl first'));
             return;
           }
 
@@ -792,41 +791,43 @@
 
       async function loadEntries({ preserveSelection = true } = {}) {
         if (!backendReady()) {
-          setDataState('offline', 'Setup required');
-          els.notesList.innerHTML = '<div class="loading-row">Add the Apps Script web-app URL in the HTML to connect Mmood.</div>';
-          return;
+          setDataState('offline', 'Setup required')
+          els.notesList.innerHTML = '<div class="loading-row">Add the Apps Script web-app URL in the HTML to connect Mmood</div>'
+          return
         }
 
-        setDataState('loading', 'Loading…');
+        setDataState('loading', 'Loading…')
 
         try {
-          const payload = await jsonp({ action: 'list' });
-          if (!payload || payload.ok !== true || !Array.isArray(payload.entries)) {
-            throw new Error(payload && payload.error ? payload.error : 'Unexpected response from backend.');
-          }
-
-          const previousSelection = preserveSelection ? state.selectedId : null;
-
-          state.entries = payload.entries
-            .map(item => ({
-              id: String(item.id),
-              timestamp: String(item.timestamp),
-              epochMs: Number(item.epochMs),
-              mood: Number(item.mood),
-              notes: String(item.notes || '')
-            }))
-            .filter(item => Number.isFinite(item.epochMs) && Number.isFinite(item.mood))
-            .sort((a, b) => a.epochMs - b.epochMs);
-
-          state.selectedId = previousSelection;
-          applyRange();
-          setDataState('live', 'LIVE data');
+          const previousSelection = preserveSelection ? state.selectedId : null
+          state.entries = await fetchEntries()
+          state.selectedId = previousSelection
+          applyRange()
+          setDataState('live', 'LIVE data')
         } catch (error) {
-          console.error(error);
-          setDataState('offline', 'Unavailable');
-          els.notesList.innerHTML = '<div class="loading-row">Could not load entries.</div>';
-          setFormStatus(error.message || 'Could not load entries.', 'error');
+          console.error(error)
+          setDataState('offline', 'Unavailable')
+          els.notesList.innerHTML = '<div class="loading-row">Could not load entries</div>'
+          setFormStatus(error.message || 'Could not load entries', 'error')
         }
+      }
+
+      async function fetchEntries() {
+        const payload = await jsonp({ action: 'list' });
+        if (!payload || payload.ok !== true || !Array.isArray(payload.entries)) {
+          throw new Error(payload && payload.error ? payload.error : 'Unexpected response from backend')
+        }
+
+        return payload.entries
+          .map(item => ({
+            id: String(item.id),
+            timestamp: String(item.timestamp),
+            epochMs: Number(item.epochMs),
+            mood: Number(item.mood),
+            notes: String(item.notes || '')
+          }))
+          .filter(item => Number.isFinite(item.epochMs) && Number.isFinite(item.mood))
+          .sort((a, b) => a.epochMs - b.epochMs)
       }
 
       function getRangeStart() {
@@ -836,7 +837,48 @@
         return now - days * 24 * 60 * 60 * 1000;
       }
 
+      function captureNotePositions() {
+        const positions = new Map();
+        els.notesList.querySelectorAll('.note-item').forEach(item => {
+          positions.set(item.dataset.id, item.getBoundingClientRect());
+        });
+        return positions;
+      }
+
+      function playNoteFlip(firstPositions) {
+        if (!firstPositions || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        const items = Array.from(els.notesList.querySelectorAll('.note-item'));
+        items.forEach(item => {
+          const first = firstPositions.get(item.dataset.id);
+          const last = item.getBoundingClientRect();
+
+          if (first) {
+            const dx = first.left - last.left;
+            const dy = first.top - last.top;
+            if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
+              item.animate(
+                [
+                  { transform: `translate(${dx}px, ${dy}px)` },
+                  { transform: 'translate(0, 0)' }
+                ],
+                { duration: FLIP_DURATION_MS, easing: FLIP_EASING }
+              );
+            }
+          } else {
+            item.animate(
+              [
+                { opacity: 0, transform: 'translateY(-5px)' },
+                { opacity: 1, transform: 'translateY(0)' }
+              ],
+              { duration: 130, easing: FLIP_EASING }
+            );
+          }
+        });
+      }
+
       function applyRange() {
+        state.pendingNotePositions = captureNotePositions();
         const start = getRangeStart();
         state.filteredEntries = state.entries.filter(entry => entry.epochMs >= start);
 
@@ -901,10 +943,10 @@
               label: 'Mood',
               data: points,
               parsing: false,
-              borderColor: '#6600ff',
-              backgroundColor: '#6600ff',
+              borderColor: '#0b2f5b',
+              backgroundColor: '#0b2f5b',
               pointBackgroundColor: '#ffffff',
-              pointBorderColor: '#6600ff',
+              pointBorderColor: '#0b2f5b',
               pointRadius,
               pointHoverRadius: 6,
               pointBorderWidth,
@@ -918,7 +960,7 @@
             maintainAspectRatio: false,
             normalized: true,
             animation: {
-              duration: 350,
+              duration: 180,
               easing: 'easeOutQuart'
             },
             interaction: {
@@ -984,6 +1026,17 @@
                   maxRotation: 0,
                   autoSkip: true,
                   maxTicksLimit: 6,
+                  callback: value => {
+                    const d = new Date(value);
+                    if (Number.isNaN(d.getTime())) return '';
+                    d.setMinutes(d.getMinutes() >= 30 ? 60 : 0, 0, 0);
+                    return new Intl.DateTimeFormat('en-AU', {
+                      day: 'numeric',
+                      month: 'short',
+                      hour: 'numeric',
+                      hour12: true
+                    }).format(d);
+                  },
                   font: {
                     family: 'Lato',
                     size: 10
@@ -1018,7 +1071,8 @@
         els.notesCount.textContent = items.length ? items.length + ' shown' : '';
 
         if (!items.length) {
-          els.notesList.innerHTML = '<div class="loading-row">No notes in this time range.</div>';
+          els.notesList.innerHTML = '<div class="loading-row">No notes in this time range</div>';
+          state.pendingNotePositions = null;
           return;
         }
 
@@ -1053,6 +1107,8 @@
           els.notesList.appendChild(button);
         });
 
+        playNoteFlip(state.pendingNotePositions);
+        state.pendingNotePositions = null;
         scrollSelectedNoteIntoView(false);
       }
 
@@ -1093,97 +1149,115 @@
       }
 
       function submitEntry() {
-        const mood = getSelectedMood();
-        const notes = els.notes.value.trim();
+        const mood = getSelectedMood()
+        const notes = els.notes.value.trim()
 
         if (!mood) {
-          setFormStatus('Choose a mood score from 1 to 10.', 'error');
-          return;
+          setFormStatus('Choose a mood score from 1 to 10', 'error')
+          return
         }
 
         if (!backendReady()) {
-          setFormStatus('Add your deployed Apps Script URL to CONFIG.backendUrl first.', 'error');
-          return;
+          setFormStatus('Add your deployed Apps Script URL to CONFIG.backendUrl first', 'error')
+          return
         }
 
-        if (state.saveTimer) window.clearTimeout(state.saveTimer);
+        const beforeIds = new Set(state.entries.map(entry => entry.id))
+        const startedAt = Date.now()
+        state.pendingSave = { mood, notes, beforeIds, startedAt }
 
-        els.saveButton.disabled = true;
-        els.saveButton.textContent = 'Saving…';
-        setDataState('saving', 'Saving…');
-        setFormStatus('');
+        els.saveButton.disabled = true
+        els.saveButton.textContent = 'Saving…'
+        setDataState('saving', 'Saving…')
+        setFormStatus('')
 
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = CONFIG.backendUrl;
-        form.target = 'mmoodSaveFrame';
-        form.style.display = 'none';
+        const form = document.createElement('form')
+        form.method = 'POST'
+        form.action = CONFIG.backendUrl
+        form.target = 'mmoodSaveFrame'
+        form.style.display = 'none'
 
         const fields = {
           action: 'add',
           mood: String(mood),
           notes
-        };
+        }
 
         Object.entries(fields).forEach(([name, value]) => {
-          const input = document.createElement('input');
-          input.type = 'hidden';
-          input.name = name;
-          input.value = value;
-          form.appendChild(input);
-        });
+          const input = document.createElement('input')
+          input.type = 'hidden'
+          input.name = name
+          input.value = value
+          form.appendChild(input)
+        })
 
-        document.body.appendChild(form);
-        form.submit();
-        form.remove();
+        document.body.appendChild(form)
+        form.submit()
+        form.remove()
 
-        state.saveTimer = window.setTimeout(() => {
-          finishSave(false, 'The save did not confirm. Check the Apps Script deployment and try again.');
-        }, CONFIG.saveTimeoutMs);
+        window.setTimeout(() => verifySavedEntry(1), CONFIG.saveVerifyDelayMs)
       }
 
-      function finishSave(success, message, newEntry) {
-        if (state.saveTimer) {
-          window.clearTimeout(state.saveTimer);
-          state.saveTimer = null;
+      async function verifySavedEntry(attempt) {
+        const pending = state.pendingSave
+        if (!pending) return
+
+        try {
+          const entries = await fetchEntries()
+          const newEntry = [...entries].reverse().find(entry =>
+            !pending.beforeIds.has(entry.id) &&
+            entry.mood === pending.mood &&
+            entry.notes === pending.notes &&
+            entry.epochMs >= pending.startedAt - 5000
+          )
+
+          if (newEntry) {
+            state.entries = entries
+            state.pendingSave = null
+            finishSaveSuccess(newEntry)
+            return
+          }
+
+          if (attempt < CONFIG.saveVerifyAttempts) {
+            window.setTimeout(() => verifySavedEntry(attempt + 1), CONFIG.saveVerifyDelayMs)
+            return
+          }
+
+          finishSaveFailure()
+        } catch (error) {
+          console.error(error)
+          if (attempt < CONFIG.saveVerifyAttempts) {
+            window.setTimeout(() => verifySavedEntry(attempt + 1), CONFIG.saveVerifyDelayMs)
+            return
+          }
+          finishSaveFailure()
         }
+      }
 
-        els.saveButton.disabled = false;
-        els.saveButton.textContent = 'Save entry';
-
-        if (!success) {
-          setDataState('offline', 'Save error');
-          setFormStatus(message || 'Could not save entry.', 'error');
-          return;
-        }
-
-        setDataState('live', 'LIVE data');
-        setFormStatus('Saved ' + formatDateTime(newEntry ? newEntry.timestamp : new Date()) + '.', 'success');
+      function finishSaveSuccess(newEntry) {
+        els.saveButton.disabled = false
+        els.saveButton.textContent = 'Save entry'
+        setDataState('live', 'LIVE data')
+        setFormStatus('Saved ' + formatDateTime(newEntry.timestamp), 'success')
 
         document.querySelectorAll('input[name="mood"]').forEach(input => {
-          input.checked = false;
-        });
-        els.notes.value = '';
-        updateTimestampPreview();
+          input.checked = false
+        })
+        els.notes.value = ''
+        updateTimestampPreview()
 
-        loadEntries({ preserveSelection: false }).then(() => {
-          if (newEntry && newEntry.id) {
-            selectEntry(String(newEntry.id), true);
-          }
-        });
+        state.selectedId = String(newEntry.id)
+        applyRange()
+        selectEntry(String(newEntry.id), true)
       }
 
-      window.addEventListener('message', event => {
-        const data = event && event.data;
-        if (!data || data.type !== 'mmood-save') return;
-
-        const payload = data.payload || {};
-        if (payload.ok === true) {
-          finishSave(true, 'Saved', payload.entry || null);
-        } else {
-          finishSave(false, payload.error || 'Could not save entry.');
-        }
-      });
+      function finishSaveFailure() {
+        state.pendingSave = null
+        els.saveButton.disabled = false
+        els.saveButton.textContent = 'Save entry'
+        setDataState('offline', 'Save unconfirmed')
+        setFormStatus('The entry may have saved, but Mmood could not verify it yet. Refresh to check', 'error')
+      }
 
       els.entryForm.addEventListener('submit', event => {
         event.preventDefault();
