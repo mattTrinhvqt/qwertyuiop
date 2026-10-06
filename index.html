@@ -25,7 +25,6 @@
       --mmood-error: #b42318;
       --mmood-positive: #14823b;
       --mmood-white: #ffffff;
-      --mmood-soft: #f8f8fb;
 
       --mmood-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
       --app-max-width: 780px;
@@ -135,8 +134,7 @@
       gap: 13px;
     }
 
-    .field-label,
-    .section-kicker {
+    .field-label {
       color: var(--mmood-muted);
       font-size: 12px;
       font-weight: 700;
@@ -168,10 +166,13 @@
       min-height: 42px;
       align-items: center;
       justify-content: center;
+
       color: var(--mmood-muted);
       background: var(--mmood-white);
+
       border: 1px solid var(--mmood-track);
       border-radius: 6px;
+
       cursor: pointer;
       font-size: 15px;
 
@@ -319,7 +320,6 @@
       align-items: center;
       gap: 2px;
       padding: 2px;
-
       border: 1px solid var(--mmood-track);
       border-radius: 7px;
     }
@@ -389,13 +389,10 @@
     .empty-state {
       position: absolute;
       inset: 0;
-
       display: none;
       align-items: center;
       justify-content: center;
-
       padding: 24px;
-
       color: var(--mmood-muted);
       font-size: 13px;
       text-align: center;
@@ -409,7 +406,6 @@
       display: flex;
       min-height: 0;
       flex-direction: column;
-
       border-left: 1px solid var(--mmood-track);
       padding-left: 12px;
     }
@@ -420,7 +416,6 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-
       color: var(--mmood-muted);
       font-size: 12px;
     }
@@ -434,7 +429,6 @@
       overflow-y: auto;
       overscroll-behavior: contain;
       padding-right: 4px;
-
       scrollbar-width: thin;
       scrollbar-color: rgba(105, 113, 138, 0.35) transparent;
     }
@@ -516,7 +510,6 @@
       flex-wrap: wrap;
       gap: 12px 22px;
       margin-top: 10px;
-
       color: var(--mmood-muted);
       font-size: 11px;
     }
@@ -644,55 +637,16 @@
           <div class="field-label">How are you feeling?</div>
 
           <div class="mood-row" role="radiogroup" aria-label="Mood score from 1 to 10">
-            <div class="mood-option">
-              <input type="radio" id="mood1" name="mood" value="1">
-              <label for="mood1">1</label>
-            </div>
-
-            <div class="mood-option">
-              <input type="radio" id="mood2" name="mood" value="2">
-              <label for="mood2">2</label>
-            </div>
-
-            <div class="mood-option">
-              <input type="radio" id="mood3" name="mood" value="3">
-              <label for="mood3">3</label>
-            </div>
-
-            <div class="mood-option">
-              <input type="radio" id="mood4" name="mood" value="4">
-              <label for="mood4">4</label>
-            </div>
-
-            <div class="mood-option">
-              <input type="radio" id="mood5" name="mood" value="5">
-              <label for="mood5">5</label>
-            </div>
-
-            <div class="mood-option">
-              <input type="radio" id="mood6" name="mood" value="6">
-              <label for="mood6">6</label>
-            </div>
-
-            <div class="mood-option">
-              <input type="radio" id="mood7" name="mood" value="7">
-              <label for="mood7">7</label>
-            </div>
-
-            <div class="mood-option">
-              <input type="radio" id="mood8" name="mood" value="8">
-              <label for="mood8">8</label>
-            </div>
-
-            <div class="mood-option">
-              <input type="radio" id="mood9" name="mood" value="9">
-              <label for="mood9">9</label>
-            </div>
-
-            <div class="mood-option">
-              <input type="radio" id="mood10" name="mood" value="10">
-              <label for="mood10">10</label>
-            </div>
+            <div class="mood-option"><input type="radio" id="mood1" name="mood" value="1"><label for="mood1">1</label></div>
+            <div class="mood-option"><input type="radio" id="mood2" name="mood" value="2"><label for="mood2">2</label></div>
+            <div class="mood-option"><input type="radio" id="mood3" name="mood" value="3"><label for="mood3">3</label></div>
+            <div class="mood-option"><input type="radio" id="mood4" name="mood" value="4"><label for="mood4">4</label></div>
+            <div class="mood-option"><input type="radio" id="mood5" name="mood" value="5"><label for="mood5">5</label></div>
+            <div class="mood-option"><input type="radio" id="mood6" name="mood" value="6"><label for="mood6">6</label></div>
+            <div class="mood-option"><input type="radio" id="mood7" name="mood" value="7"><label for="mood7">7</label></div>
+            <div class="mood-option"><input type="radio" id="mood8" name="mood" value="8"><label for="mood8">8</label></div>
+            <div class="mood-option"><input type="radio" id="mood9" name="mood" value="9"><label for="mood9">9</label></div>
+            <div class="mood-option"><input type="radio" id="mood10" name="mood" value="10"><label for="mood10">10</label></div>
           </div>
         </div>
 
@@ -733,45 +687,10 @@
           <h2 id="historyHeading">Mood over time</h2>
 
           <div class="range-tabs" role="tablist" aria-label="Time range">
-            <button
-              class="range-tab"
-              type="button"
-              data-range="7"
-              role="tab"
-              aria-selected="false"
-            >
-              7D
-            </button>
-
-            <button
-              class="range-tab is-active"
-              type="button"
-              data-range="30"
-              role="tab"
-              aria-selected="true"
-            >
-              30D
-            </button>
-
-            <button
-              class="range-tab"
-              type="button"
-              data-range="90"
-              role="tab"
-              aria-selected="false"
-            >
-              90D
-            </button>
-
-            <button
-              class="range-tab"
-              type="button"
-              data-range="all"
-              role="tab"
-              aria-selected="false"
-            >
-              All
-            </button>
+            <button class="range-tab" type="button" data-range="7" role="tab" aria-selected="false">7D</button>
+            <button class="range-tab is-active" type="button" data-range="30" role="tab" aria-selected="true">30D</button>
+            <button class="range-tab" type="button" data-range="90" role="tab" aria-selected="false">90D</button>
+            <button class="range-tab" type="button" data-range="all" role="tab" aria-selected="false">All</button>
           </div>
         </div>
 
@@ -779,10 +698,7 @@
 
           <div class="chart-panel">
             <div id="chartShell" class="chart-shell">
-              <canvas
-                id="moodChart"
-                aria-label="Mood score over time"
-              ></canvas>
+              <canvas id="moodChart" aria-label="Mood score over time"></canvas>
 
               <div class="empty-state">
                 No entries in this time range yet
@@ -803,15 +719,10 @@
               <span id="notesCount" class="notes-count"></span>
             </div>
 
-            <div
-              id="notesList"
-              class="notes-list"
-              tabindex="0"
-            >
-              <div class="loading-row">
-                Loading entries…
-              </div>
+            <div id="notesList" class="notes-list" tabindex="0">
+              <div class="loading-row">Loading entries…</div>
             </div>
+
           </aside>
         </div>
       </section>
@@ -834,9 +745,7 @@
       const FLIP_EASING = 'cubic-bezier(0.22, 1, 0.36, 1)'
 
       const CONFIG = Object.freeze({
-        backendUrl:
-          'https://script.google.com/macros/s/AKfycbyVAVwOpdCbvwFe9jzOee0nk1v8mkafTChAuu15Dn81TyDADDEnRmI8LtP-U-qUhukgsA/exec',
-
+        backendUrl: 'https://script.google.com/macros/s/AKfycbyVAVwOpdCbvwFe9jzOee0nk1v8mkafTChAuu15Dn81TyDADDEnRmI8LtP-U-qUhukgsA/exec',
         defaultRangeDays: 30,
         jsonpTimeoutMs: 20000,
         saveRefreshDelayMs: 700
@@ -871,36 +780,19 @@
       }
 
       function backendReady() {
-        return /^https:\/\/script\.google\.com\/macros\/s\/.+\/exec(?:\?.*)?$/
-          .test(CONFIG.backendUrl)
+        return /^https:\/\/script\.google\.com\/macros\/s\/.+\/exec(?:\?.*)?$/.test(CONFIG.backendUrl)
       }
 
       function setDataState(mode, text) {
-        els.dataState.classList.toggle(
-          'is-live',
-          mode === 'live'
-        )
-
-        els.dataState.classList.toggle(
-          'is-saving',
-          mode === 'saving'
-        )
-
+        els.dataState.classList.toggle('is-live', mode === 'live')
+        els.dataState.classList.toggle('is-saving', mode === 'saving')
         els.dataStateText.textContent = text
       }
 
       function setFormStatus(message, type = '') {
         els.formStatus.textContent = message
-
-        els.formStatus.classList.toggle(
-          'is-error',
-          type === 'error'
-        )
-
-        els.formStatus.classList.toggle(
-          'is-success',
-          type === 'success'
-        )
+        els.formStatus.classList.toggle('is-error', type === 'error')
+        els.formStatus.classList.toggle('is-success', type === 'success')
       }
 
       function formatDateTime(value) {
@@ -912,22 +804,17 @@
           return ''
         }
 
-        return new Intl.DateTimeFormat(
-          'en-AU',
-          {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          }
-        ).format(d)
+        return new Intl.DateTimeFormat('en-AU', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        }).format(d)
       }
 
       function formatRoundedHour(value) {
-        const d = value instanceof Date
-          ? new Date(value)
-          : new Date(value)
+        const d = new Date(value)
 
         if (Number.isNaN(d.getTime())) {
           return ''
@@ -939,15 +826,12 @@
 
         d.setMinutes(0, 0, 0)
 
-        return new Intl.DateTimeFormat(
-          'en-AU',
-          {
-            day: 'numeric',
-            month: 'short',
-            hour: 'numeric',
-            hour12: true
-          }
-        ).format(d)
+        return new Intl.DateTimeFormat('en-AU', {
+          day: 'numeric',
+          month: 'short',
+          hour: 'numeric',
+          hour12: true
+        }).format(d)
       }
 
       function updateTimestampPreview() {
@@ -958,11 +842,7 @@
       function jsonp(params) {
         return new Promise((resolve, reject) => {
           if (!backendReady()) {
-            reject(
-              new Error(
-                'Add your Apps Script web-app URL to CONFIG.backendUrl first'
-              )
-            )
+            reject(new Error('Add your Apps Script web-app URL to CONFIG.backendUrl first'))
             return
           }
 
@@ -974,9 +854,7 @@
 
           const timer =
             window.setTimeout(
-              () => cleanup(
-                new Error('The data request timed out')
-              ),
+              () => cleanup(new Error('The data request timed out')),
               CONFIG.jsonpTimeoutMs
             )
 
@@ -999,30 +877,17 @@
           const url =
             new URL(CONFIG.backendUrl)
 
-          Object.entries(params)
-            .forEach(([key, value]) => {
-              url.searchParams.set(key, value)
-            })
+          Object.entries(params).forEach(([key, value]) => {
+            url.searchParams.set(key, value)
+          })
 
-          url.searchParams.set(
-            'callback',
-            callbackName
-          )
-
-          url.searchParams.set(
-            '_',
-            Date.now().toString()
-          )
+          url.searchParams.set('callback', callbackName)
+          url.searchParams.set('_', Date.now().toString())
 
           script.onerror =
-            () => cleanup(
-              new Error(
-                'Could not reach the Mmood backend'
-              )
-            )
+            () => cleanup(new Error('Could not reach the Mmood backend'))
 
           script.src = url.toString()
-
           document.head.appendChild(script)
         })
       }
@@ -1057,20 +922,14 @@
             Number.isFinite(item.epochMs) &&
             Number.isFinite(item.mood)
           )
-          .sort(
-            (a, b) =>
-              a.epochMs - b.epochMs
-          )
+          .sort((a, b) => a.epochMs - b.epochMs)
       }
 
       async function loadEntries({
         preserveSelection = true
       } = {}) {
         if (!backendReady()) {
-          setDataState(
-            'offline',
-            'Setup required'
-          )
+          setDataState('offline', 'Setup required')
 
           els.notesList.innerHTML =
             '<div class="loading-row">Add the Apps Script web-app URL in the HTML to connect Mmood</div>'
@@ -1078,10 +937,7 @@
           return
         }
 
-        setDataState(
-          'loading',
-          'Loading…'
-        )
+        setDataState('loading', 'Loading…')
 
         try {
           const previousSelection =
@@ -1097,24 +953,17 @@
 
           applyRange()
 
-          setDataState(
-            'live',
-            'LIVE data'
-          )
+          setDataState('live', 'LIVE data')
         } catch (error) {
           console.error(error)
 
-          setDataState(
-            'offline',
-            'Unavailable'
-          )
+          setDataState('offline', 'Unavailable')
 
           els.notesList.innerHTML =
             '<div class="loading-row">Could not load entries</div>'
 
           setFormStatus(
-            error.message ||
-              'Could not load entries',
+            error.message || 'Could not load entries',
             'error'
           )
         }
@@ -1153,26 +1002,19 @@
       function playNoteFlip(firstPositions) {
         if (
           !firstPositions ||
-          window
-            .matchMedia(
-              '(prefers-reduced-motion: reduce)'
-            )
-            .matches
+          window.matchMedia('(prefers-reduced-motion: reduce)').matches
         ) {
           return
         }
 
         const items =
           Array.from(
-            els.notesList
-              .querySelectorAll('.note-item')
+            els.notesList.querySelectorAll('.note-item')
           )
 
         items.forEach(item => {
           const first =
-            firstPositions.get(
-              item.dataset.id
-            )
+            firstPositions.get(item.dataset.id)
 
           const last =
             item.getBoundingClientRect()
@@ -1200,11 +1042,8 @@
                   }
                 ],
                 {
-                  duration:
-                    FLIP_DURATION_MS,
-
-                  easing:
-                    FLIP_EASING
+                  duration: FLIP_DURATION_MS,
+                  easing: FLIP_EASING
                 }
               )
             }
@@ -1213,13 +1052,11 @@
               [
                 {
                   opacity: 0,
-                  transform:
-                    'translateY(-5px)'
+                  transform: 'translateY(-5px)'
                 },
                 {
                   opacity: 1,
-                  transform:
-                    'translateY(0)'
+                  transform: 'translateY(0)'
                 }
               ],
               {
@@ -1245,12 +1082,10 @@
           )
 
         if (
-          !state.filteredEntries
-            .some(
-              entry =>
-                entry.id ===
-                state.selectedId
-            )
+          !state.filteredEntries.some(
+            entry =>
+              entry.id === state.selectedId
+          )
         ) {
           state.selectedId =
             state.filteredEntries.length
@@ -1292,11 +1127,7 @@
           '<span><strong>' +
             items.length +
             '</strong> entr' +
-            (
-              items.length === 1
-                ? 'y'
-                : 'ies'
-            ) +
+            (items.length === 1 ? 'y' : 'ies') +
             '</span>',
 
           '<span>Average <strong>' +
@@ -1310,15 +1141,13 @@
       }
 
       /*
-       * Custom x-axis tick marks
+       * Major and minor x-axis ticks
        *
-       * Major ticks:
-       * darker and longer
+       * IMPORTANT:
+       * chart.chartArea.bottom is the actual plot baseline
        *
-       * Minor ticks:
-       * shorter and lighter
-       *
-       * The interval adapts to the visible time span
+       * x.bottom is lower down because it includes the
+       * space used for x-axis text labels
        */
       const mmoodAxisTicksPlugin = {
         id: 'mmoodAxisTicks',
@@ -1327,7 +1156,7 @@
           const x =
             chart.scales.x
 
-          if (!x) {
+          if (!x || !chart.chartArea) {
             return
           }
 
@@ -1361,14 +1190,10 @@
               6 * 60 * 60 * 1000
 
             majorEvery = 4
-          } else if (
-            span <= 35 * DAY
-          ) {
+          } else if (span <= 35 * DAY) {
             minorStep = DAY
             majorEvery = 7
-          } else if (
-            span <= 100 * DAY
-          ) {
+          } else if (span <= 100 * DAY) {
             minorStep =
               7 * DAY
 
@@ -1384,8 +1209,14 @@
             Math.ceil(min / minorStep) *
             minorStep
 
+          /*
+           * This is the key correction
+           *
+           * The ticks now start on the actual
+           * x-axis line rather than below the labels
+           */
           const axisY =
-            x.bottom
+            chart.chartArea.bottom
 
           ctx.save()
 
@@ -1400,8 +1231,8 @@
               x.getPixelForValue(t)
 
             if (
-              px < x.left - 1 ||
-              px > x.right + 1
+              px < chart.chartArea.left - 1 ||
+              px > chart.chartArea.right + 1
             ) {
               continue
             }
@@ -1413,17 +1244,14 @@
 
             ctx.moveTo(
               Math.round(px) + 0.5,
-              axisY
+              Math.round(axisY) + 0.5
             )
 
             ctx.lineTo(
               Math.round(px) + 0.5,
-              axisY +
-                (
-                  major
-                    ? 6
-                    : 3
-                )
+              Math.round(axisY) +
+                (major ? 6 : 3) +
+                0.5
             )
 
             ctx.strokeStyle =
@@ -1445,9 +1273,7 @@
         }
       }
 
-      Chart.register(
-        mmoodAxisTicksPlugin
-      )
+      Chart.register(mmoodAxisTicksPlugin)
 
       function renderChart() {
         const points =
@@ -1465,12 +1291,10 @@
         )
 
         const selectedIndex =
-          state.filteredEntries
-            .findIndex(
-              entry =>
-                entry.id ===
-                state.selectedId
-            )
+          state.filteredEntries.findIndex(
+            entry =>
+              entry.id === state.selectedId
+          )
 
         const pointRadius =
           points.map(
@@ -1489,22 +1313,14 @@
           )
 
         if (state.chart) {
-          state.chart
-            .data
-            .datasets[0]
-            .data = points
+          state.chart.data.datasets[0].data =
+            points
 
-          state.chart
-            .data
-            .datasets[0]
-            .pointRadius =
-              pointRadius
+          state.chart.data.datasets[0].pointRadius =
+            pointRadius
 
-          state.chart
-            .data
-            .datasets[0]
-            .pointBorderWidth =
-              pointBorderWidth
+          state.chart.data.datasets[0].pointBorderWidth =
+            pointBorderWidth
 
           state.chart.update()
           return
@@ -1520,9 +1336,7 @@
                 datasets: [
                   {
                     label: 'Mood',
-
                     data: points,
-
                     parsing: false,
 
                     borderColor:
@@ -1538,15 +1352,11 @@
                       '#0b2f5b',
 
                     pointRadius,
-
                     pointHoverRadius: 6,
-
                     pointBorderWidth,
 
                     borderWidth: 2,
-
                     tension: 0.22,
-
                     spanGaps: true
                   }
                 ]
@@ -1554,16 +1364,12 @@
 
               options: {
                 responsive: true,
-
-                maintainAspectRatio:
-                  false,
-
+                maintainAspectRatio: false,
                 normalized: true,
 
                 animation: {
                   duration: 170,
-                  easing:
-                    'easeOutQuart'
+                  easing: 'easeOutQuart'
                 },
 
                 interaction: {
@@ -1576,9 +1382,7 @@
                   _event,
                   elements
                 ) => {
-                  if (
-                    !elements.length
-                  ) {
+                  if (!elements.length) {
                     return
                   }
 
@@ -1586,9 +1390,7 @@
                     elements[0].index
 
                   const entry =
-                    state.filteredEntries[
-                      index
-                    ]
+                    state.filteredEntries[index]
 
                   if (entry) {
                     selectEntry(
@@ -1602,9 +1404,7 @@
                   _event,
                   elements
                 ) => {
-                  if (
-                    !elements.length
-                  ) {
+                  if (!elements.length) {
                     return
                   }
 
@@ -1612,14 +1412,11 @@
                     elements[0].index
 
                   const entry =
-                    state.filteredEntries[
-                      index
-                    ]
+                    state.filteredEntries[index]
 
                   if (
                     entry &&
-                    entry.id !==
-                      state.selectedId
+                    entry.id !== state.selectedId
                   ) {
                     selectEntry(
                       entry.id,
@@ -1639,39 +1436,31 @@
 
                     callbacks: {
                       title: items => {
-                        if (
-                          !items.length
-                        ) {
+                        if (!items.length) {
                           return ''
                         }
 
                         const entry =
                           state.filteredEntries[
-                            items[0]
-                              .dataIndex
+                            items[0].dataIndex
                           ]
 
                         return entry
-                          ? formatDateTime(
-                              entry.timestamp
-                            )
+                          ? formatDateTime(entry.timestamp)
                           : ''
                       },
 
                       label:
                         context =>
                           'Mood: ' +
-                          context
-                            .parsed
-                            .y +
+                          context.parsed.y +
                           '/10',
 
                       afterLabel:
                         context => {
                           const entry =
                             state.filteredEntries[
-                              context
-                                .dataIndex
+                              context.dataIndex
                             ]
 
                           if (
@@ -1682,14 +1471,8 @@
                           }
 
                           return (
-                            entry.notes
-                              .length > 90
-                              ? entry.notes
-                                  .slice(
-                                    0,
-                                    87
-                                  ) +
-                                '…'
+                            entry.notes.length > 90
+                              ? entry.notes.slice(0, 87) + '…'
                               : entry.notes
                           )
                         }
@@ -1712,17 +1495,10 @@
                         'd MMM yyyy, h:mm a',
 
                       displayFormats: {
-                        hour:
-                          'd MMM h a',
-
-                        day:
-                          'd MMM',
-
-                        week:
-                          'd MMM',
-
-                        month:
-                          'MMM yyyy'
+                        hour: 'd MMM h a',
+                        day: 'd MMM',
+                        week: 'd MMM',
+                        month: 'MMM yyyy'
                       }
                     },
 
@@ -1739,20 +1515,14 @@
 
                     ticks: {
                       color: '#69718a',
-
                       padding: 7,
-
                       maxRotation: 0,
-
                       autoSkip: true,
-
                       maxTicksLimit: 6,
 
                       callback:
                         value =>
-                          formatRoundedHour(
-                            value
-                          ),
+                          formatRoundedHour(value),
 
                       font: {
                         family: 'Lato',
@@ -1767,31 +1537,22 @@
 
                     ticks: {
                       stepSize: 1,
-
-                      color:
-                        '#69718a',
+                      color: '#69718a',
 
                       font: {
-                        family:
-                          'Lato',
-
+                        family: 'Lato',
                         size: 10
                       }
                     },
 
                     grid: {
-                      color:
-                        '#e8eaf0',
-
+                      color: '#e8eaf0',
                       lineWidth: 1
                     },
 
                     border: {
                       display: true,
-
-                      color:
-                        '#151515',
-
+                      color: '#151515',
                       width: 1
                     }
                   }
@@ -1803,25 +1564,20 @@
 
       function renderNotes() {
         /*
-         * Only entries containing actual
-         * note text appear here
-         *
-         * Blank-note mood entries remain
-         * on the graph
+         * Blank-note entries stay on the graph
+         * but do not appear in the Notes panel
          */
         const items =
           [...state.filteredEntries]
             .filter(
               entry =>
-                entry.notes
-                  .trim() !== ''
+                entry.notes.trim() !== ''
             )
             .reverse()
 
         els.notesCount.textContent =
           items.length
-            ? items.length +
-              ' shown'
+            ? items.length + ' shown'
             : ''
 
         if (!items.length) {
@@ -1838,17 +1594,14 @@
 
         items.forEach(entry => {
           const button =
-            document.createElement(
-              'button'
-            )
+            document.createElement('button')
 
           button.type = 'button'
 
           button.className =
             'note-item' +
             (
-              entry.id ===
-              state.selectedId
+              entry.id === state.selectedId
                 ? ' is-selected'
                 : ''
             )
@@ -1858,37 +1611,28 @@
 
           button.setAttribute(
             'aria-pressed',
-            entry.id ===
-              state.selectedId
+            entry.id === state.selectedId
               ? 'true'
               : 'false'
           )
 
           const meta =
-            document.createElement(
-              'div'
-            )
+            document.createElement('div')
 
           meta.className =
             'note-meta'
 
           const date =
-            document.createElement(
-              'span'
-            )
+            document.createElement('span')
 
           date.className =
             'note-date'
 
           date.textContent =
-            formatDateTime(
-              entry.timestamp
-            )
+            formatDateTime(entry.timestamp)
 
           const score =
-            document.createElement(
-              'span'
-            )
+            document.createElement('span')
 
           score.className =
             'note-score'
@@ -1902,9 +1646,7 @@
           )
 
           const text =
-            document.createElement(
-              'div'
-            )
+            document.createElement('div')
 
           text.className =
             'note-text'
@@ -1926,8 +1668,9 @@
               )
           )
 
-          els.notesList
-            .appendChild(button)
+          els.notesList.appendChild(
+            button
+          )
         })
 
         playNoteFlip(
@@ -1951,10 +1694,9 @@
           String(id)
 
         const buttons =
-          els.notesList
-            .querySelectorAll(
-              '.note-item'
-            )
+          els.notesList.querySelectorAll(
+            '.note-item'
+          )
 
         buttons.forEach(button => {
           const active =
@@ -1979,42 +1721,28 @@
           state.chart
         ) {
           const selectedIndex =
-            state.filteredEntries
-              .findIndex(
-                entry =>
-                  entry.id ===
-                  state.selectedId
-              )
+            state.filteredEntries.findIndex(
+              entry =>
+                entry.id === state.selectedId
+            )
 
-          state.chart
-            .data
-            .datasets[0]
-            .pointRadius =
-              state.filteredEntries
-                .map(
-                  (_, index) =>
-                    index ===
-                    selectedIndex
-                      ? 6
-                      : 3.5
-                )
+          state.chart.data.datasets[0].pointRadius =
+            state.filteredEntries.map(
+              (_, index) =>
+                index === selectedIndex
+                  ? 6
+                  : 3.5
+            )
 
-          state.chart
-            .data
-            .datasets[0]
-            .pointBorderWidth =
-              state.filteredEntries
-                .map(
-                  (_, index) =>
-                    index ===
-                    selectedIndex
-                      ? 2
-                      : 1
-                )
+          state.chart.data.datasets[0].pointBorderWidth =
+            state.filteredEntries.map(
+              (_, index) =>
+                index === selectedIndex
+                  ? 2
+                  : 1
+            )
 
-          state.chart.update(
-            'none'
-          )
+          state.chart.update('none')
         }
 
         if (scrollNote) {
@@ -2032,19 +1760,15 @@
         }
 
         const item =
-          els.notesList
-            .querySelector(
-              '.note-item[data-id="' +
-                CSS.escape(
-                  state.selectedId
-                ) +
-                '"]'
-            )
+          els.notesList.querySelector(
+            '.note-item[data-id="' +
+              CSS.escape(state.selectedId) +
+              '"]'
+          )
 
         /*
-         * An entry may legitimately
-         * have no note and therefore
-         * no matching note row
+         * No matching row is normal if
+         * the selected mood has no note
          */
         if (!item) {
           return
@@ -2055,11 +1779,9 @@
 
           behavior:
             smooth &&
-            !window
-              .matchMedia(
-                '(prefers-reduced-motion: reduce)'
-              )
-              .matches
+            !window.matchMedia(
+              '(prefers-reduced-motion: reduce)'
+            ).matches
               ? 'smooth'
               : 'auto'
         })
@@ -2072,9 +1794,7 @@
           )
 
         return checked
-          ? Number(
-              checked.value
-            )
+          ? Number(checked.value)
           : null
       }
 
@@ -2134,15 +1854,15 @@
         setFormStatus('')
 
         const form =
-          document.createElement(
-            'form'
-          )
+          document.createElement('form')
 
         form.method = 'POST'
         form.action =
           CONFIG.backendUrl
+
         form.target =
           'mmoodSaveFrame'
+
         form.style.display =
           'none'
 
@@ -2169,9 +1889,7 @@
               input.value =
                 value
 
-              form.appendChild(
-                input
-              )
+              form.appendChild(input)
             }
           )
 
@@ -2203,22 +1921,15 @@
               .reverse()
               .find(
                 entry =>
-                  !pending
-                    .beforeIds
-                    .has(
-                      entry.id
-                    ) &&
-
+                  !pending.beforeIds.has(
+                    entry.id
+                  ) &&
                   entry.mood ===
                     pending.mood &&
-
                   entry.notes ===
                     pending.notes &&
-
                   entry.epochMs >=
-                    pending
-                      .startedAt -
-                      5000
+                    pending.startedAt - 5000
               ) || null
 
           state.entries =
@@ -2234,14 +1945,6 @@
           matchedEntry
         )
 
-        /*
-         * If Apps Script finished the
-         * POST before the Sheet list
-         * endpoint reflected the new row,
-         * refresh again shortly afterward
-         *
-         * This is not treated as an error
-         */
         if (!matchedEntry) {
           window.setTimeout(
             () => {
@@ -2250,8 +1953,7 @@
                   false
               })
             },
-            CONFIG
-              .saveRefreshDelayMs
+            CONFIG.saveRefreshDelayMs
           )
         }
       }
@@ -2285,8 +1987,7 @@
             'input[name="mood"]'
           )
           .forEach(input => {
-            input.checked =
-              false
+            input.checked = false
           })
 
         els.notes.value = ''
@@ -2298,16 +1999,12 @@
           newEntry.id
         ) {
           state.selectedId =
-            String(
-              newEntry.id
-            )
+            String(newEntry.id)
 
           applyRange()
 
           selectEntry(
-            String(
-              newEntry.id
-            ),
+            String(newEntry.id),
             true
           )
         } else {
@@ -2318,9 +2015,7 @@
       els.saveFrame.addEventListener(
         'load',
         () => {
-          if (
-            state.pendingSave
-          ) {
+          if (state.pendingSave) {
             confirmSavedFromFrame()
           }
         }
@@ -2342,8 +2037,8 @@
               state.range =
                 button.dataset.range
 
-              els.rangeTabs
-                .forEach(tab => {
+              els.rangeTabs.forEach(
+                tab => {
                   const active =
                     tab === button
 
@@ -2358,7 +2053,8 @@
                       ? 'true'
                       : 'false'
                   )
-                })
+                }
+              )
 
               applyRange()
             }
