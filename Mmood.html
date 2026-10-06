@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Mmood</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+
+  <style>
+    :root {
+      --pff-purple: #6600ff;
+      --pff-ink: #151515;
+      --pff-muted: #69718a;
+      --pff-track: #e8eaf0;
+      --pff-error: #b42318;
+      --pff-positive: #14823b;
+      --pff-white: #ffffff;
+      --pff-soft: #f8f8fb;
+      --pff-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+      --app-max-width: 780px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--pff-white);
+    }
+
+    body {
+      color: var(--pff-ink);
+      font-family: 'Lato', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button,
+    input,
+    textarea {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #fit {
+      width: 100%;
+      padding: 1px;
+    }
+
+    #app {
+      width: min(calc(100% - 10px), var(--app-max-width));
+      margin: 0 auto;
+      padding: 12px 2px 18px;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 10px;
+    }
+
+    .app-title-wrap {
+      min-width: 0;
+    }
+
+    h1,
+    h2,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      color: var(--pff-ink);
+      font-size: 25px;
+      font-weight: 400;
+      line-height: 1.1;
+    }
+
+    .subtitle {
+      margin-top: 4px;
+      color: var(--pff-muted);
+      font-size: 13px;
+      line-height: 1.3;
+    }
+
+    .data-state {
+      display: inline-flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: 5px;
+      min-height: 20px;
+      color: var(--pff-muted);
+      font-size: 11px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .data-state-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--pff-muted);
+    }
+
+    .data-state.is-live .data-state-dot {
+      background: #e53935;
+    }
+
+    .data-state.is-saving .data-state-dot {
+      background: #c27c00;
+    }
+
+    .gradient-line {
+      height: 2px;
+      margin: 10px 0 16px;
+      background: linear-gradient(
+        90deg,
+        var(--pff-white) 0%,
+        var(--pff-purple) 50%,
+        var(--pff-white) 100%
+      );
+    }
+
+    .entry-form {
+      display: grid;
+      gap: 13px;
+    }
+
+    .field-label,
+    .section-kicker {
+      color: var(--pff-muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .mood-row {
+      display: grid;
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 7px;
+    }
+
+    .mood-option {
+      position: relative;
+    }
+
+    .mood-option input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .mood-option label {
+      display: flex;
+      min-height: 42px;
+      align-items: center;
+      justify-content: center;
+      color: var(--pff-muted);
+      background: var(--pff-white);
+      border: 1px solid var(--pff-track);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 15px;
+      transition:
+        color 120ms ease,
+        border-color 120ms ease,
+        background-color 120ms ease,
+        transform 120ms ease;
+    }
+
+    .mood-option input:checked + label {
+      color: var(--pff-white);
+      background: var(--pff-purple);
+      border-color: var(--pff-purple);
+    }
+
+    .mood-option input:focus-visible + label {
+      outline: 2px solid var(--pff-purple);
+      outline-offset: 2px;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .mood-option label:hover {
+        color: var(--pff-purple);
+        border-color: var(--pff-purple);
+        transform: translateY(-1px);
+      }
+
+      .mood-option input:checked + label:hover {
+        color: var(--pff-white);
+      }
+    }
+
+    .notes-input {
+      display: block;
+      width: 100%;
+      min-height: 84px;
+      resize: vertical;
+      padding: 10px 11px;
+      color: var(--pff-ink);
+      background: var(--pff-white);
+      border: 1px solid var(--pff-track);
+      border-radius: 6px;
+      font-size: 16px;
+      line-height: 1.45;
+      outline: none;
+      transition: border-color 120ms ease;
+    }
+
+    .notes-input:focus {
+      border-color: var(--pff-purple);
+    }
+
+    .form-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .timestamp-preview {
+      color: var(--pff-muted);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .save-button {
+      min-width: 104px;
+      min-height: 40px;
+      padding: 0 16px;
+      color: var(--pff-white);
+      background: var(--pff-ink);
+      border: 1px solid var(--pff-ink);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
+      transition:
+        background-color 120ms ease,
+        border-color 120ms ease,
+        opacity 120ms ease;
+    }
+
+    .save-button:hover,
+    .save-button:focus-visible {
+      background: var(--pff-purple);
+      border-color: var(--pff-purple);
+      outline: none;
+    }
+
+    .save-button:disabled {
+      cursor: wait;
+      opacity: 0.55;
+    }
+
+    .status {
+      min-height: 18px;
+      margin-top: 7px;
+      color: var(--pff-muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .status.is-error {
+      color: var(--pff-error);
+    }
+
+    .status.is-success {
+      color: var(--pff-positive);
+    }
+
+    .history {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--pff-track);
+    }
+
+    .history-heading-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .history-heading-row h2 {
+      font-size: 18px;
+      font-weight: 400;
+      line-height: 1.2;
+    }
+
+    .range-tabs {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 2px;
+      border: 1px solid var(--pff-track);
+      border-radius: 7px;
+    }
+
+    .range-tab {
+      min-width: 42px;
+      min-height: 30px;
+      padding: 0 8px;
+      color: var(--pff-muted);
+      background: transparent;
+      border: 0;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .range-tab.is-active {
+      color: var(--pff-purple);
+      background: #f3edff;
+    }
+
+    .range-tab:focus-visible {
+      outline: 2px solid var(--pff-purple);
+      outline-offset: 1px;
+    }
+
+    .history-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(235px, 0.8fr);
+      gap: 14px;
+      min-height: 310px;
+    }
+
+    .chart-panel,
+    .notes-panel {
+      min-width: 0;
+    }
+
+    .chart-shell {
+      position: relative;
+      height: 300px;
+      min-height: 250px;
+      padding: 8px 0 0;
+    }
+
+    .chart-shell canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    .empty-state {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      color: var(--pff-muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .chart-shell.is-empty .empty-state {
+      display: flex;
+    }
+
+    .notes-panel {
+      display: flex;
+      min-height: 0;
+      flex-direction: column;
+      border-left: 1px solid var(--pff-track);
+      padding-left: 12px;
+    }
+
+    .notes-panel-title {
+      display: flex;
+      min-height: 30px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--pff-muted);
+      font-size: 12px;
+    }
+
+    .notes-count {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .notes-list {
+      height: 270px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding-right: 4px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(105, 113, 138, 0.35) transparent;
+    }
+
+    .note-item {
+      width: 100%;
+      padding: 9px 8px 10px;
+      color: var(--pff-ink);
+      background: transparent;
+      border: 0;
+      border-bottom: 1px solid var(--pff-track);
+      border-radius: 0;
+      cursor: pointer;
+      text-align: left;
+      transition:
+        background-color 160ms ease,
+        border-color 160ms ease;
+    }
+
+    .note-item:first-child {
+      border-top: 1px solid var(--pff-track);
+    }
+
+    .note-item.is-selected {
+      background: #f7f2ff;
+      border-bottom-color: #dccaff;
+    }
+
+    .note-item:focus-visible {
+      outline: 2px solid var(--pff-purple);
+      outline-offset: -2px;
+    }
+
+    .note-meta {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .note-date {
+      min-width: 0;
+      color: var(--pff-muted);
+      font-size: 11px;
+      line-height: 1.25;
+    }
+
+    .note-score {
+      flex: 0 0 auto;
+      color: var(--pff-purple);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .note-text {
+      color: var(--pff-ink);
+      font-size: 13px;
+      line-height: 1.38;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .note-text.is-empty {
+      color: var(--pff-muted);
+      font-style: italic;
+    }
+
+    .loading-row {
+      padding: 18px 8px;
+      color: var(--pff-muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .summary-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 22px;
+      margin-top: 10px;
+      color: var(--pff-muted);
+      font-size: 11px;
+    }
+
+    .summary-row strong {
+      color: var(--pff-ink);
+      font-weight: 700;
+    }
+
+    .hidden-frame {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      border: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    @media (max-width: 650px) {
+      #app {
+        width: min(calc(100% - 6px), 560px);
+        padding-top: 10px;
+      }
+
+      .app-header {
+        align-items: flex-start;
+      }
+
+      h1 {
+        font-size: 23px;
+      }
+
+      .mood-row {
+        gap: 4px;
+      }
+
+      .mood-option label {
+        min-height: 40px;
+        border-radius: 5px;
+        font-size: 14px;
+      }
+
+      .history-heading-row {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .range-tabs {
+        align-self: stretch;
+        justify-content: space-between;
+      }
+
+      .range-tab {
+        flex: 1 1 0;
+      }
+
+      .history-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .chart-shell {
+        height: 270px;
+      }
+
+      .notes-panel {
+        border-top: 1px solid var(--pff-track);
+        border-left: 0;
+        padding-top: 8px;
+        padding-left: 0;
+      }
+
+      .notes-list {
+        height: 245px;
+      }
+    }
+
+    @media (max-width: 410px) {
+      .mood-row {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+
+      .form-bottom {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .save-button {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="fit">
+    <main id="app">
+      <header class="app-header">
+        <div class="app-title-wrap">
+          <h1>Mmood</h1>
+          <p class="subtitle">A simple record of how you’re feeling over time.</p>
+        </div>
+
+        <div id="dataState" class="data-state" aria-live="polite">
+          <span class="data-state-dot" aria-hidden="true"></span>
+          <span id="dataStateText">Connecting…</span>
+        </div>
+      </header>
+
+      <div class="gradient-line" aria-hidden="true"></div>
+
+      <form id="entryForm" class="entry-form" autocomplete="off">
+        <div>
+          <div class="field-label">How are you feeling?</div>
+
+          <div class="mood-row" role="radiogroup" aria-label="Mood score from 1 to 10">
+            <div class="mood-option"><input type="radio" id="mood1" name="mood" value="1"><label for="mood1">1</label></div>
+            <div class="mood-option"><input type="radio" id="mood2" name="mood" value="2"><label for="mood2">2</label></div>
+            <div class="mood-option"><input type="radio" id="mood3" name="mood" value="3"><label for="mood3">3</label></div>
+            <div class="mood-option"><input type="radio" id="mood4" name="mood" value="4"><label for="mood4">4</label></div>
+            <div class="mood-option"><input type="radio" id="mood5" name="mood" value="5"><label for="mood5">5</label></div>
+            <div class="mood-option"><input type="radio" id="mood6" name="mood" value="6"><label for="mood6">6</label></div>
+            <div class="mood-option"><input type="radio" id="mood7" name="mood" value="7"><label for="mood7">7</label></div>
+            <div class="mood-option"><input type="radio" id="mood8" name="mood" value="8"><label for="mood8">8</label></div>
+            <div class="mood-option"><input type="radio" id="mood9" name="mood" value="9"><label for="mood9">9</label></div>
+            <div class="mood-option"><input type="radio" id="mood10" name="mood" value="10"><label for="mood10">10</label></div>
+          </div>
+        </div>
+
+        <div>
+          <label class="field-label" for="notes">Notes</label>
+          <textarea
+            id="notes"
+            class="notes-input"
+            name="notes"
+            maxlength="5000"
+            placeholder="Anything you want to remember about today…"
+          ></textarea>
+        </div>
+
+        <div>
+          <div class="form-bottom">
+            <div id="timestampPreview" class="timestamp-preview">Date and time are saved automatically.</div>
+            <button id="saveButton" class="save-button" type="submit">Save entry</button>
+          </div>
+          <div id="formStatus" class="status" role="status" aria-live="polite"></div>
+        </div>
+      </form>
+
+      <section class="history" aria-labelledby="historyHeading">
+        <div class="history-heading-row">
+          <h2 id="historyHeading">Mood over time</h2>
+
+          <div class="range-tabs" role="tablist" aria-label="Time range">
+            <button class="range-tab" type="button" data-range="7" role="tab" aria-selected="false">7D</button>
+            <button class="range-tab is-active" type="button" data-range="30" role="tab" aria-selected="true">30D</button>
+            <button class="range-tab" type="button" data-range="90" role="tab" aria-selected="false">90D</button>
+            <button class="range-tab" type="button" data-range="all" role="tab" aria-selected="false">All</button>
+          </div>
+        </div>
+
+        <div class="history-grid">
+          <div class="chart-panel">
+            <div id="chartShell" class="chart-shell">
+              <canvas id="moodChart" aria-label="Mood score over time"></canvas>
+              <div class="empty-state">No entries in this time range yet.</div>
+            </div>
+
+            <div id="summaryRow" class="summary-row" aria-live="polite"></div>
+          </div>
+
+          <aside class="notes-panel" aria-label="Mood notes">
+            <div class="notes-panel-title">
+              <span>Notes</span>
+              <span id="notesCount" class="notes-count"></span>
+            </div>
+
+            <div id="notesList" class="notes-list" tabindex="0">
+              <div class="loading-row">Loading entries…</div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <iframe name="mmoodSaveFrame" class="hidden-frame" title="Mmood save response"></iframe>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const CONFIG = Object.freeze({
+        // STEP 1 AFTER DEPLOYING Code.gs:
+        // Replace this placeholder with your Apps Script /exec web-app URL.
+        backendUrl: 'https://script.google.com/macros/s/AKfycbyVAVwOpdCbvwFe9jzOee0nk1v8mkafTChAuu15Dn81TyDADDEnRmI8LtP-U-qUhukgsA/exec',
+        defaultRangeDays: 30,
+        jsonpTimeoutMs: 20000,
+        saveTimeoutMs: 20000
+      });
+
+      const state = {
+        entries: [],
+        filteredEntries: [],
+        selectedId: null,
+        range: String(CONFIG.defaultRangeDays),
+        chart: null,
+        saveTimer: null,
+        callbackCounter: 0
+      };
+
+      const els = {
+        entryForm: document.getElementById('entryForm'),
+        notes: document.getElementById('notes'),
+        saveButton: document.getElementById('saveButton'),
+        formStatus: document.getElementById('formStatus'),
+        timestampPreview: document.getElementById('timestampPreview'),
+        dataState: document.getElementById('dataState'),
+        dataStateText: document.getElementById('dataStateText'),
+        chartShell: document.getElementById('chartShell'),
+        moodChart: document.getElementById('moodChart'),
+        notesList: document.getElementById('notesList'),
+        notesCount: document.getElementById('notesCount'),
+        summaryRow: document.getElementById('summaryRow'),
+        rangeTabs: Array.from(document.querySelectorAll('.range-tab'))
+      };
+
+      function backendReady() {
+        return /^https:\/\/script\.google\.com\/macros\/s\/.+\/exec(?:\?.*)?$/.test(CONFIG.backendUrl);
+      }
+
+      function setDataState(mode, text) {
+        els.dataState.classList.toggle('is-live', mode === 'live');
+        els.dataState.classList.toggle('is-saving', mode === 'saving');
+        els.dataStateText.textContent = text;
+      }
+
+      function setFormStatus(message, type = '') {
+        els.formStatus.textContent = message;
+        els.formStatus.classList.toggle('is-error', type === 'error');
+        els.formStatus.classList.toggle('is-success', type === 'success');
+      }
+
+      function formatDateTime(value) {
+        const d = value instanceof Date ? value : new Date(value);
+        if (Number.isNaN(d.getTime())) return '';
+
+        return new Intl.DateTimeFormat('en-AU', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        }).format(d);
+      }
+
+      function updateTimestampPreview() {
+        els.timestampPreview.textContent = 'Will save as ' + formatDateTime(new Date());
+      }
+
+      function jsonp(params) {
+        return new Promise((resolve, reject) => {
+          if (!backendReady()) {
+            reject(new Error('Add your Apps Script web-app URL to CONFIG.backendUrl first.'));
+            return;
+          }
+
+          const callbackName = '__mmoodJsonp' + (++state.callbackCounter);
+          const script = document.createElement('script');
+          const timer = window.setTimeout(() => cleanup(new Error('The data request timed out.')), CONFIG.jsonpTimeoutMs);
+
+          function cleanup(error, value) {
+            window.clearTimeout(timer);
+            delete window[callbackName];
+            script.remove();
+            if (error) reject(error);
+            else resolve(value);
+          }
+
+          window[callbackName] = payload => cleanup(null, payload);
+
+          const url = new URL(CONFIG.backendUrl);
+          Object.entries(params).forEach(([key, value]) => url.searchParams.set(key, value));
+          url.searchParams.set('callback', callbackName);
+          url.searchParams.set('_', Date.now().toString());
+
+          script.onerror = () => cleanup(new Error('Could not reach the Mmood backend.'));
+          script.src = url.toString();
+          document.head.appendChild(script);
+        });
+      }
+
+      async function loadEntries({ preserveSelection = true } = {}) {
+        if (!backendReady()) {
+          setDataState('offline', 'Setup required');
+          els.notesList.innerHTML = '<div class="loading-row">Add the Apps Script web-app URL in the HTML to connect Mmood.</div>';
+          return;
+        }
+
+        setDataState('loading', 'Loading…');
+
+        try {
+          const payload = await jsonp({ action: 'list' });
+          if (!payload || payload.ok !== true || !Array.isArray(payload.entries)) {
+            throw new Error(payload && payload.error ? payload.error : 'Unexpected response from backend.');
+          }
+
+          const previousSelection = preserveSelection ? state.selectedId : null;
+
+          state.entries = payload.entries
+            .map(item => ({
+              id: String(item.id),
+              timestamp: String(item.timestamp),
+              epochMs: Number(item.epochMs),
+              mood: Number(item.mood),
+              notes: String(item.notes || '')
+            }))
+            .filter(item => Number.isFinite(item.epochMs) && Number.isFinite(item.mood))
+            .sort((a, b) => a.epochMs - b.epochMs);
+
+          state.selectedId = previousSelection;
+          applyRange();
+          setDataState('live', 'LIVE data');
+        } catch (error) {
+          console.error(error);
+          setDataState('offline', 'Unavailable');
+          els.notesList.innerHTML = '<div class="loading-row">Could not load entries.</div>';
+          setFormStatus(error.message || 'Could not load entries.', 'error');
+        }
+      }
+
+      function getRangeStart() {
+        if (state.range === 'all') return -Infinity;
+        const days = Number(state.range);
+        const now = Date.now();
+        return now - days * 24 * 60 * 60 * 1000;
+      }
+
+      function applyRange() {
+        const start = getRangeStart();
+        state.filteredEntries = state.entries.filter(entry => entry.epochMs >= start);
+
+        if (!state.filteredEntries.some(entry => entry.id === state.selectedId)) {
+          state.selectedId = state.filteredEntries.length
+            ? state.filteredEntries[state.filteredEntries.length - 1].id
+            : null;
+        }
+
+        renderAll();
+      }
+
+      function renderAll() {
+        renderChart();
+        renderNotes();
+        renderSummary();
+      }
+
+      function renderSummary() {
+        const items = state.filteredEntries;
+
+        if (!items.length) {
+          els.summaryRow.innerHTML = '';
+          return;
+        }
+
+        const mean = items.reduce((sum, item) => sum + item.mood, 0) / items.length;
+        const latest = items[items.length - 1];
+
+        els.summaryRow.innerHTML = [
+          '<span><strong>' + items.length + '</strong> entr' + (items.length === 1 ? 'y' : 'ies') + '</span>',
+          '<span>Average <strong>' + mean.toFixed(1) + '</strong></span>',
+          '<span>Latest <strong>' + latest.mood + '/10</strong></span>'
+        ].join('');
+      }
+
+      function renderChart() {
+        const points = state.filteredEntries.map(entry => ({
+          x: entry.epochMs,
+          y: entry.mood,
+          id: entry.id
+        }));
+
+        els.chartShell.classList.toggle('is-empty', points.length === 0);
+
+        const selectedIndex = state.filteredEntries.findIndex(entry => entry.id === state.selectedId);
+        const pointRadius = points.map((_, index) => index === selectedIndex ? 6 : 3.5);
+        const pointBorderWidth = points.map((_, index) => index === selectedIndex ? 2 : 1);
+
+        if (state.chart) {
+          state.chart.data.datasets[0].data = points;
+          state.chart.data.datasets[0].pointRadius = pointRadius;
+          state.chart.data.datasets[0].pointBorderWidth = pointBorderWidth;
+          state.chart.update('none');
+          return;
+        }
+
+        state.chart = new Chart(els.moodChart, {
+          type: 'line',
+          data: {
+            datasets: [{
+              label: 'Mood',
+              data: points,
+              parsing: false,
+              borderColor: '#6600ff',
+              backgroundColor: '#6600ff',
+              pointBackgroundColor: '#ffffff',
+              pointBorderColor: '#6600ff',
+              pointRadius,
+              pointHoverRadius: 6,
+              pointBorderWidth,
+              borderWidth: 2,
+              tension: 0.22,
+              spanGaps: true
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            normalized: true,
+            animation: {
+              duration: 350,
+              easing: 'easeOutQuart'
+            },
+            interaction: {
+              mode: 'nearest',
+              axis: 'xy',
+              intersect: false
+            },
+            onClick: (_event, elements) => {
+              if (!elements.length) return;
+              const index = elements[0].index;
+              const entry = state.filteredEntries[index];
+              if (entry) selectEntry(entry.id, true);
+            },
+            onHover: (_event, elements) => {
+              if (!elements.length) return;
+              const index = elements[0].index;
+              const entry = state.filteredEntries[index];
+              if (entry && entry.id !== state.selectedId) {
+                selectEntry(entry.id, true, false);
+              }
+            },
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                displayColors: false,
+                callbacks: {
+                  title: items => {
+                    if (!items.length) return '';
+                    const entry = state.filteredEntries[items[0].dataIndex];
+                    return entry ? formatDateTime(entry.timestamp) : '';
+                  },
+                  label: context => 'Mood: ' + context.parsed.y + '/10',
+                  afterLabel: context => {
+                    const entry = state.filteredEntries[context.dataIndex];
+                    if (!entry || !entry.notes) return '';
+                    return entry.notes.length > 90 ? entry.notes.slice(0, 87) + '…' : entry.notes;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                type: 'time',
+                time: {
+                  tooltipFormat: 'd MMM yyyy, h:mm a',
+                  displayFormats: {
+                    hour: 'd MMM',
+                    day: 'd MMM',
+                    week: 'd MMM',
+                    month: 'MMM yyyy'
+                  }
+                },
+                grid: {
+                  display: false
+                },
+                border: {
+                  color: '#151515'
+                },
+                ticks: {
+                  color: '#69718a',
+                  maxRotation: 0,
+                  autoSkip: true,
+                  maxTicksLimit: 6,
+                  font: {
+                    family: 'Lato',
+                    size: 10
+                  }
+                }
+              },
+              y: {
+                min: 1,
+                max: 10,
+                ticks: {
+                  stepSize: 1,
+                  color: '#69718a',
+                  font: {
+                    family: 'Lato',
+                    size: 10
+                  }
+                },
+                grid: {
+                  color: '#e8eaf0'
+                },
+                border: {
+                  color: '#151515'
+                }
+              }
+            }
+          }
+        });
+      }
+
+      function renderNotes() {
+        const items = [...state.filteredEntries].reverse();
+        els.notesCount.textContent = items.length ? items.length + ' shown' : '';
+
+        if (!items.length) {
+          els.notesList.innerHTML = '<div class="loading-row">No notes in this time range.</div>';
+          return;
+        }
+
+        els.notesList.innerHTML = '';
+
+        items.forEach(entry => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'note-item' + (entry.id === state.selectedId ? ' is-selected' : '');
+          button.dataset.id = entry.id;
+          button.setAttribute('aria-pressed', entry.id === state.selectedId ? 'true' : 'false');
+
+          const meta = document.createElement('div');
+          meta.className = 'note-meta';
+
+          const date = document.createElement('span');
+          date.className = 'note-date';
+          date.textContent = formatDateTime(entry.timestamp);
+
+          const score = document.createElement('span');
+          score.className = 'note-score';
+          score.textContent = entry.mood + '/10';
+
+          meta.append(date, score);
+
+          const text = document.createElement('div');
+          text.className = 'note-text' + (entry.notes ? '' : ' is-empty');
+          text.textContent = entry.notes || 'No note';
+
+          button.append(meta, text);
+          button.addEventListener('click', () => selectEntry(entry.id, false));
+          els.notesList.appendChild(button);
+        });
+
+        scrollSelectedNoteIntoView(false);
+      }
+
+      function selectEntry(id, scrollNote = true, chartUpdate = true) {
+        state.selectedId = String(id);
+
+        const buttons = els.notesList.querySelectorAll('.note-item');
+        buttons.forEach(button => {
+          const active = button.dataset.id === state.selectedId;
+          button.classList.toggle('is-selected', active);
+          button.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+
+        if (chartUpdate && state.chart) {
+          const selectedIndex = state.filteredEntries.findIndex(entry => entry.id === state.selectedId);
+          state.chart.data.datasets[0].pointRadius = state.filteredEntries.map((_, index) => index === selectedIndex ? 6 : 3.5);
+          state.chart.data.datasets[0].pointBorderWidth = state.filteredEntries.map((_, index) => index === selectedIndex ? 2 : 1);
+          state.chart.update('none');
+        }
+
+        if (scrollNote) scrollSelectedNoteIntoView(true);
+      }
+
+      function scrollSelectedNoteIntoView(smooth) {
+        if (!state.selectedId) return;
+        const item = els.notesList.querySelector('.note-item[data-id="' + CSS.escape(state.selectedId) + '"]');
+        if (!item) return;
+
+        item.scrollIntoView({
+          block: 'nearest',
+          behavior: smooth && !window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'smooth' : 'auto'
+        });
+      }
+
+      function getSelectedMood() {
+        const checked = document.querySelector('input[name="mood"]:checked');
+        return checked ? Number(checked.value) : null;
+      }
+
+      function submitEntry() {
+        const mood = getSelectedMood();
+        const notes = els.notes.value.trim();
+
+        if (!mood) {
+          setFormStatus('Choose a mood score from 1 to 10.', 'error');
+          return;
+        }
+
+        if (!backendReady()) {
+          setFormStatus('Add your deployed Apps Script URL to CONFIG.backendUrl first.', 'error');
+          return;
+        }
+
+        if (state.saveTimer) window.clearTimeout(state.saveTimer);
+
+        els.saveButton.disabled = true;
+        els.saveButton.textContent = 'Saving…';
+        setDataState('saving', 'Saving…');
+        setFormStatus('');
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = CONFIG.backendUrl;
+        form.target = 'mmoodSaveFrame';
+        form.style.display = 'none';
+
+        const fields = {
+          action: 'add',
+          mood: String(mood),
+          notes
+        };
+
+        Object.entries(fields).forEach(([name, value]) => {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = name;
+          input.value = value;
+          form.appendChild(input);
+        });
+
+        document.body.appendChild(form);
+        form.submit();
+        form.remove();
+
+        state.saveTimer = window.setTimeout(() => {
+          finishSave(false, 'The save did not confirm. Check the Apps Script deployment and try again.');
+        }, CONFIG.saveTimeoutMs);
+      }
+
+      function finishSave(success, message, newEntry) {
+        if (state.saveTimer) {
+          window.clearTimeout(state.saveTimer);
+          state.saveTimer = null;
+        }
+
+        els.saveButton.disabled = false;
+        els.saveButton.textContent = 'Save entry';
+
+        if (!success) {
+          setDataState('offline', 'Save error');
+          setFormStatus(message || 'Could not save entry.', 'error');
+          return;
+        }
+
+        setDataState('live', 'LIVE data');
+        setFormStatus('Saved ' + formatDateTime(newEntry ? newEntry.timestamp : new Date()) + '.', 'success');
+
+        document.querySelectorAll('input[name="mood"]').forEach(input => {
+          input.checked = false;
+        });
+        els.notes.value = '';
+        updateTimestampPreview();
+
+        loadEntries({ preserveSelection: false }).then(() => {
+          if (newEntry && newEntry.id) {
+            selectEntry(String(newEntry.id), true);
+          }
+        });
+      }
+
+      window.addEventListener('message', event => {
+        const data = event && event.data;
+        if (!data || data.type !== 'mmood-save') return;
+
+        const payload = data.payload || {};
+        if (payload.ok === true) {
+          finishSave(true, 'Saved', payload.entry || null);
+        } else {
+          finishSave(false, payload.error || 'Could not save entry.');
+        }
+      });
+
+      els.entryForm.addEventListener('submit', event => {
+        event.preventDefault();
+        submitEntry();
+      });
+
+      els.rangeTabs.forEach(button => {
+        button.addEventListener('click', () => {
+          state.range = button.dataset.range;
+
+          els.rangeTabs.forEach(tab => {
+            const active = tab === button;
+            tab.classList.toggle('is-active', active);
+            tab.setAttribute('aria-selected', active ? 'true' : 'false');
+          });
+
+          applyRange();
+        });
+      });
+
+      updateTimestampPreview();
+      window.setInterval(updateTimestampPreview, 30000);
+      loadEntries({ preserveSelection: false });
+    })();
+  </script>
+</body>
+</html>
