@@ -230,6 +230,11 @@
       border-color: var(--mmood-blue);
     }
 
+    .notes-input:focus-visible {
+      outline: 2px solid var(--mmood-blue);
+      outline-offset: 2px;
+    }
+
     .form-bottom {
       display: flex;
       align-items: center;
@@ -273,10 +278,53 @@
       transform: translateY(-1px);
     }
 
+    .save-button:focus-visible {
+      outline: 2px solid var(--mmood-blue);
+      outline-offset: 2px;
+    }
+
     .save-button:disabled {
       cursor: wait;
       opacity: 0.55;
       transform: none;
+    }
+
+    .saving-dots {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      margin-left: 5px;
+      vertical-align: middle;
+    }
+
+    .saving-dots span {
+      display: block;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.35;
+      animation: mmood-saving-dot 1.05s ease-in-out infinite;
+    }
+
+    .saving-dots span:nth-child(2) {
+      animation-delay: 0.15s;
+    }
+
+    .saving-dots span:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    @keyframes mmood-saving-dot {
+      0%, 60%, 100% {
+        opacity: 0.35;
+        transform: translateY(0);
+      }
+
+      30% {
+        opacity: 1;
+        transform: translateY(-2px);
+      }
     }
 
     .status {
@@ -431,6 +479,11 @@
       padding-right: 4px;
       scrollbar-width: thin;
       scrollbar-color: rgba(105, 113, 138, 0.35) transparent;
+    }
+
+    .notes-list:focus-visible {
+      outline: 2px solid var(--mmood-blue);
+      outline-offset: 2px;
     }
 
     .note-item {
@@ -813,27 +866,6 @@
         }).format(d)
       }
 
-      function formatRoundedHour(value) {
-        const d = new Date(value)
-
-        if (Number.isNaN(d.getTime())) {
-          return ''
-        }
-
-        if (d.getMinutes() >= 30) {
-          d.setHours(d.getHours() + 1)
-        }
-
-        d.setMinutes(0, 0, 0)
-
-        return new Intl.DateTimeFormat('en-AU', {
-          day: 'numeric',
-          month: 'short',
-          hour: 'numeric',
-          hour12: true
-        }).format(d)
-      }
-
       function updateTimestampPreview() {
         els.timestampPreview.textContent =
           'Will save as ' + formatDateTime(new Date())
@@ -1162,6 +1194,14 @@
               entry.id === state.selectedId
           )
 
+        const pointBackgroundColor =
+          state.filteredEntries.map(
+            entry =>
+              entry.notes.trim() !== ''
+                ? '#bfd1e3'
+                : '#ffffff'
+          )
+
         const pointRadius =
           points.map(
             (_, index) =>
@@ -1181,6 +1221,9 @@
         if (state.chart) {
           state.chart.data.datasets[0].data =
             points
+
+          state.chart.data.datasets[0].pointBackgroundColor =
+            pointBackgroundColor
 
           state.chart.data.datasets[0].pointRadius =
             pointRadius
@@ -1211,8 +1254,7 @@
                     backgroundColor:
                       '#0b2f5b',
 
-                    pointBackgroundColor:
-                      '#ffffff',
+                    pointBackgroundColor,
 
                     pointBorderColor:
                       '#0b2f5b',
@@ -1357,14 +1399,15 @@
                     type: 'time',
 
                     time: {
+                      minUnit: 'day',
                       tooltipFormat:
                         'd MMM yyyy, h:mm a',
 
                       displayFormats: {
-                        hour: 'd MMM h a',
                         day: 'd MMM',
                         week: 'd MMM',
-                        month: 'MMM yyyy'
+                        month: 'MMM yyyy',
+                        year: 'yyyy'
                       }
                     },
 
@@ -1385,10 +1428,6 @@
                       maxRotation: 0,
                       autoSkip: true,
                       maxTicksLimit: 6,
-
-                      callback:
-                        value =>
-                          formatRoundedHour(value),
 
                       font: {
                         family: 'Lato',
@@ -1709,8 +1748,8 @@
         els.saveButton.disabled =
           true
 
-        els.saveButton.textContent =
-          'Saving…'
+        els.saveButton.innerHTML =
+          'Saving<span class="saving-dots" aria-hidden="true"><span></span><span></span><span></span></span>'
 
         setDataState(
           'saving',
