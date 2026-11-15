@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <title>Thought record</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --mmood-blue: #0b2f5b;
+      --mmood-blue-soft: #eaf1f8;
+      --mmood-blue-selected: #eef4fa;
+      --mmood-blue-border: #bfd1e3;
+      --mmood-ink: #151515;
+      --mmood-muted: #69718a;
+      --mmood-track: #e8eaf0;
+      --mmood-error: #b42318;
+      --mmood-white: #ffffff;
+      --app-max-width: 1180px;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      background: var(--mmood-white);
+    }
+
+    body {
+      color: var(--mmood-ink);
+      font-family: 'Lato', Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    #fit {
+      width: 100%;
+      padding: 1px;
+    }
+
+    #app {
+      width: min(calc(100% - 10px), var(--app-max-width));
+      margin: 0 auto;
+      padding: 12px 2px 18px;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 10px;
+    }
+
+    h1,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      color: var(--mmood-ink);
+      font-size: 25px;
+      font-weight: 400;
+      line-height: 1.1;
+    }
+
+    .data-state {
+      display: inline-flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: 5px;
+      min-height: 20px;
+      color: var(--mmood-muted);
+      font-size: 11px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .data-state-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--mmood-muted);
+    }
+
+    .data-state.is-live .data-state-dot {
+      background: #e53935;
+    }
+
+    .data-state.is-error {
+      color: var(--mmood-error);
+    }
+
+    .data-state.is-error .data-state-dot {
+      background: var(--mmood-error);
+    }
+
+    .gradient-line {
+      height: 2px;
+      margin: 10px 0 14px;
+      background: linear-gradient(
+        90deg,
+        var(--mmood-white) 0%,
+        var(--mmood-blue) 50%,
+        var(--mmood-white) 100%
+      );
+    }
+
+    .table-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 22px;
+      margin-bottom: 6px;
+      color: var(--mmood-muted);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .table-count {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .table-shell {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      background: var(--mmood-white);
+      border-top: 1px solid var(--mmood-track);
+      border-bottom: 1px solid var(--mmood-track);
+    }
+
+    .table-scroll {
+      width: 100%;
+      max-height: 72vh;
+      overflow: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(105, 113, 138, 0.35) transparent;
+    }
+
+    table {
+      width: 100%;
+      min-width: 1120px;
+      border-collapse: separate;
+      border-spacing: 0;
+      table-layout: fixed;
+    }
+
+    col.date { width: 105px; }
+    col.situation { width: 220px; }
+    col.awareness { width: 180px; }
+    col.analysis { width: 285px; }
+    col.challenge { width: 180px; }
+    col.replace { width: 250px; }
+
+    th,
+    td {
+      padding: 10px 11px;
+      border-right: 1px solid var(--mmood-track);
+      border-bottom: 1px solid var(--mmood-track);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th:last-child,
+    td:last-child {
+      border-right: 0;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      color: var(--mmood-muted);
+      background: var(--mmood-white);
+      border-bottom: 1px solid var(--mmood-ink);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      line-height: 1.2;
+      text-transform: uppercase;
+    }
+
+    tbody td {
+      color: var(--mmood-ink);
+      background: var(--mmood-white);
+      font-size: 13px;
+      line-height: 1.45;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    tbody tr:nth-child(even) td {
+      background: #fbfcfd;
+    }
+
+    tbody tr:hover td {
+      background: var(--mmood-blue-selected);
+    }
+
+    thead th:first-child,
+    tbody td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 3;
+      box-shadow: 1px 0 0 var(--mmood-track);
+    }
+
+    thead th:first-child {
+      z-index: 5;
+    }
+
+    tbody tr:nth-child(even) td:first-child {
+      background: #fbfcfd;
+    }
+
+    tbody tr:hover td:first-child {
+      background: var(--mmood-blue-selected);
+    }
+
+    .date-cell {
+      color: var(--mmood-muted);
+      font-size: 12px;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .empty-state,
+    .error-state,
+    .loading-state {
+      padding: 28px 16px;
+      color: var(--mmood-muted);
+      font-size: 13px;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .error-state {
+      color: var(--mmood-error);
+    }
+
+    .loading-bar {
+      height: 2px;
+      overflow: hidden;
+      background: var(--mmood-track);
+    }
+
+    .loading-bar::after {
+      content: '';
+      display: block;
+      width: 35%;
+      height: 100%;
+      background: var(--mmood-blue);
+      animation: loading 1.1s ease-in-out infinite;
+    }
+
+    @keyframes loading {
+      0% { transform: translateX(-120%); }
+      100% { transform: translateX(360%); }
+    }
+
+    @media (max-width: 640px) {
+      #app {
+        width: min(calc(100% - 6px), var(--app-max-width));
+        padding-top: 8px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+
+      .app-header {
+        align-items: center;
+      }
+
+      .table-meta {
+        font-size: 11px;
+      }
+
+      th,
+      td {
+        padding: 9px 9px;
+      }
+
+      tbody td {
+        font-size: 12px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="fit">
+    <main id="app">
+      <header class="app-header">
+        <h1>Thought record</h1>
+
+        <div id="dataState" class="data-state" aria-live="polite">
+          <span class="data-state-dot" aria-hidden="true"></span>
+          <span id="dataStateText">Connecting…</span>
+        </div>
+      </header>
+
+      <div class="gradient-line" aria-hidden="true"></div>
+
+      <div class="table-meta">
+        <span id="tableCount" class="table-count">Loading entries…</span>
+        <span>Sheet1</span>
+      </div>
+
+      <div class="table-shell">
+        <div id="loadingBar" class="loading-bar" aria-hidden="true"></div>
+
+        <div class="table-scroll" tabindex="0" aria-label="Thought record table">
+          <table>
+            <colgroup>
+              <col class="date">
+              <col class="situation">
+              <col class="awareness">
+              <col class="analysis">
+              <col class="challenge">
+              <col class="replace">
+            </colgroup>
+
+            <thead>
+              <tr id="tableHead"></tr>
+            </thead>
+
+            <tbody id="tableBody">
+              <tr>
+                <td colspan="6" class="loading-state">Loading entries…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const REFRESH_MS = 60000;
+      const FALLBACK_HEADERS = [
+        'Date',
+        'Situation',
+        'Awareness',
+        'Self-analysis',
+        'Challenge',
+        'Replace'
+      ];
+
+      const els = {
+        dataState: document.getElementById('dataState'),
+        dataStateText: document.getElementById('dataStateText'),
+        tableCount: document.getElementById('tableCount'),
+        tableHead: document.getElementById('tableHead'),
+        tableBody: document.getElementById('tableBody'),
+        loadingBar: document.getElementById('loadingBar')
+      };
+
+      function setDataState(mode, text) {
+        els.dataState.classList.toggle('is-live', mode === 'live');
+        els.dataState.classList.toggle('is-error', mode === 'error');
+        els.dataStateText.textContent = text;
+      }
+
+      function setLoading(isLoading) {
+        els.loadingBar.hidden = !isLoading;
+      }
+
+      function renderHeaders(headers) {
+        els.tableHead.innerHTML = '';
+
+        (headers && headers.length ? headers : FALLBACK_HEADERS)
+          .slice(0, 6)
+          .forEach(label => {
+            const th = document.createElement('th');
+            th.scope = 'col';
+            th.textContent = label;
+            els.tableHead.appendChild(th);
+          });
+      }
+
+      function renderRows(rows) {
+        els.tableBody.innerHTML = '';
+
+        if (!rows.length) {
+          const tr = document.createElement('tr');
+          const td = document.createElement('td');
+          td.colSpan = 6;
+          td.className = 'empty-state';
+          td.textContent = 'No entries yet';
+          tr.appendChild(td);
+          els.tableBody.appendChild(tr);
+          els.tableCount.textContent = '0 entries';
+          return;
+        }
+
+        const fragment = document.createDocumentFragment();
+
+        rows.forEach(row => {
+          const tr = document.createElement('tr');
+
+          for (let index = 0; index < 6; index += 1) {
+            const td = document.createElement('td');
+            const value = row[index] == null ? '' : String(row[index]);
+
+            td.textContent = value;
+
+            if (index === 0) {
+              td.className = 'date-cell';
+            }
+
+            tr.appendChild(td);
+          }
+
+          fragment.appendChild(tr);
+        });
+
+        els.tableBody.appendChild(fragment);
+        els.tableCount.textContent = rows.length + (rows.length === 1 ? ' entry' : ' entries');
+      }
+
+      function renderError(error) {
+        els.tableBody.innerHTML = '';
+
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+
+        td.colSpan = 6;
+        td.className = 'error-state';
+        td.textContent = 'Could not load Sheet1. ' + (error && error.message ? error.message : 'Please refresh.');
+
+        tr.appendChild(td);
+        els.tableBody.appendChild(tr);
+
+        els.tableCount.textContent = 'Data unavailable';
+        setDataState('error', 'Data unavailable');
+      }
+
+      function loadData() {
+        setLoading(true);
+        setDataState('', 'Connecting…');
+
+        google.script.run
+          .withSuccessHandler(payload => {
+            renderHeaders(payload && payload.headers ? payload.headers : FALLBACK_HEADERS);
+            renderRows(payload && Array.isArray(payload.rows) ? payload.rows : []);
+            setDataState('live', 'LIVE data');
+            setLoading(false);
+          })
+          .withFailureHandler(error => {
+            renderHeaders(FALLBACK_HEADERS);
+            renderError(error);
+            setLoading(false);
+          })
+          .getThoughtRecordData();
+      }
+
+      renderHeaders(FALLBACK_HEADERS);
+      loadData();
+      window.setInterval(loadData, REFRESH_MS);
+    })();
+  </script>
+</body>
+</html>
