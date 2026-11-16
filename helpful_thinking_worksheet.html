@@ -106,13 +106,12 @@
     .table-meta{
       display:flex;
       align-items:center;
-      justify-content:space-between;
+      justify-content:flex-end;
       gap:12px;
       min-height:22px;
       margin-bottom:6px;
     }
 
-    .table-hint,
     .table-count{
       color:var(--mmood-muted);
       font-size:12px;
@@ -146,18 +145,15 @@
 
     table{
       width:100%;
-      min-width:1120px;
+      min-width:100%;
       border-collapse:separate;
       border-spacing:0;
-      table-layout:fixed;
+      table-layout:auto;
     }
 
-    col.date{width:105px}
-    col.situation{width:220px}
-    col.awareness{width:180px}
-    col.analysis{width:285px}
-    col.challenge{width:180px}
-    col.replace{width:250px}
+    /* Content-aware sizing. Short / mostly empty columns stay compact,
+       while text-heavy columns naturally receive more room. */
+    col.date{width:1%}
 
     th,td{
       padding:10px 11px;
@@ -190,6 +186,8 @@
       line-height:1.45;
       white-space:normal;
       overflow-wrap:anywhere;
+      word-break:normal;
+      hyphens:auto;
     }
 
     tbody tr.data-row:nth-child(odd) td{background:#fbfcfd}
@@ -208,16 +206,24 @@
     tbody tr.data-row:hover td:first-child{background:var(--mmood-blue-selected)}
 
     .date-cell{
+      width:1%;
+      min-width:92px;
       color:var(--mmood-muted);
       font-size:12px;
       white-space:nowrap;
       font-variant-numeric:tabular-nums;
     }
 
+    /* Visually distinguish intentionally blank saved cells. */
+    .empty-cell{
+      color:var(--mmood-muted);
+      text-align:center;
+    }
+
     /* New-entry row stays directly below the sticky heading. */
     .new-entry-row td{
       position:sticky;
-      top:33px;
+      top:var(--table-head-height, 33px);
       z-index:4;
       padding:6px;
       background:#fbfdff;
@@ -373,6 +379,10 @@
     }
 
     @media(max-width:700px){
+      /* Six editable fields cannot remain comfortably usable below this width,
+         so horizontal scrolling is enabled only on genuinely narrow screens. */
+      table{min-width:720px}
+
       #app{
         width:min(calc(100% - 6px),var(--app-max-width));
         padding-top:8px;
@@ -382,7 +392,7 @@
       .app-header{align-items:center}
       th,td{padding:9px}
       tbody td{font-size:12px}
-      .new-entry-row td{top:32px}
+      .new-entry-row td{top:var(--table-head-height, 32px)}
       .entry-input{font-size:12px}
     }
 
@@ -425,7 +435,6 @@
       <div class="gradient-line" aria-hidden="true"></div>
 
       <div class="table-meta">
-        <p class="table-hint">Use the first row to add an entry. Date is added automatically.</p>
         <span id="tableCount" class="table-count">Loading entries…</span>
       </div>
 
@@ -539,6 +548,8 @@
 
       const REFRESH_MS = 60000;
       const BRIDGE_TIMEOUT_MS = 10000;
+      const BRIDGE_WAIT_MS = 6000;
+      const BRIDGE_POLL_MS = 100;
 
       const FALLBACK_HEADERS = [
         'Date',
@@ -575,6 +586,28 @@
         return Boolean(window.google && google.script && google.script.run);
       }
 
+      function waitForAppsScriptBridge() {
+        return new Promise((resolve, reject) => {
+          const started = Date.now();
+
+          const check = () => {
+            if (hasAppsScriptBridge()) {
+              resolve();
+              return;
+            }
+
+            if (Date.now() - started >= BRIDGE_WAIT_MS) {
+              reject(new Error('Apps Script bridge unavailable.'));
+              return;
+            }
+
+            window.setTimeout(check, BRIDGE_POLL_MS);
+          };
+
+          check();
+        });
+      }
+
       function setDataState(mode, text) {
         els.dataState.classList.toggle('is-live', mode === 'live');
         els.dataState.classList.toggle('is-saving', mode === 'saving');
@@ -592,6 +625,13 @@
         els.loadingBar.hidden = !isLoading;
       }
 
+      function updateStickyHeaderOffset() {
+        requestAnimationFrame(() => {
+          const height = Math.ceil(els.tableHead.getBoundingClientRect().height || 33);
+          document.documentElement.style.setProperty('--table-head-height', height + 'px');
+        });
+      }
+
       function renderHeaders(headers) {
         els.tableHead.innerHTML = '';
 
@@ -603,6 +643,8 @@
             th.textContent = label;
             els.tableHead.appendChild(th);
           });
+
+        updateStickyHeaderOffset();
       }
 
       function removeDataRows() {
@@ -639,9 +681,17 @@
 
           for (let index = 0; index < 6; index += 1) {
             const td = document.createElement('td');
-            td.textContent = row[index] == null ? '' : String(row[index]);
+            const value = row[index] == null ? '' : String(row[index]).trim();
 
-            if (index === 0) td.className = 'date-cell';
+            td.textContent = value || '—';
+
+            if (index === 0) {
+              td.classList.add('date-cell');
+            }
+
+            if (!value) {
+              td.classList.add('empty-cell');
+            }
 
             tr.appendChild(td);
           }
@@ -692,13 +742,24 @@
         setLoading(false);
         setDataState('error', 'Apps Script required');
         setEntryStatus(
-          'Open the deployed Google Apps Script web-app URL to view or save entries.',
+          'Open the deployed Google Apps Script /exec web-app URL to view or save entries.',
           'error'
         );
         els.saveButton.disabled = true;
-        renderLoadError({
-          message: 'This HTML file cannot connect to the spreadsheet by itself.'
-        });
+        removeDataRows();
+
+        const tr = document.createElement('tr');
+        tr.className = 'error-data-row';
+
+        const td = document.createElement('td');
+        td.colSpan = 6;
+        td.className = 'error-state';
+        td.textContent =
+          'This page is not running inside Google Apps Script. Open the deployed /exec web-app URL instead.';
+
+        tr.appendChild(td);
+        els.tableBody.appendChild(tr);
+        els.tableCount.textContent = 'Not connected';
       }
 
       function loadData({quiet = false} = {}) {
@@ -812,16 +873,25 @@
 
       renderHeaders(FALLBACK_HEADERS);
       els.entryForm.addEventListener('submit', saveEntry);
+      window.addEventListener('resize', updateStickyHeaderOffset);
 
-      if (hasAppsScriptBridge()) {
-        loadData();
+      async function initialiseApp() {
+        setLoading(true);
+        setDataState('', 'Connecting…');
 
-        setInterval(() => {
-          if (!saveInProgress) loadData({quiet:true});
-        }, REFRESH_MS);
-      } else {
-        showWrongHostError();
+        try {
+          await waitForAppsScriptBridge();
+          loadData();
+
+          window.setInterval(() => {
+            if (!saveInProgress) loadData({quiet:true});
+          }, REFRESH_MS);
+        } catch (error) {
+          showWrongHostError();
+        }
       }
+
+      initialiseApp();
     })();
   </script>
 </body>
