@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light">
-  <title>Thought record</title>
+  <title>Helpful Thinking Worksheet</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,103 +12,90 @@
 
   <style>
     :root {
-      --mmood-blue: #0b2f5b;
-      --mmood-blue-soft: #eaf1f8;
-      --mmood-blue-selected: #eef4fa;
-      --mmood-blue-border: #bfd1e3;
-      --mmood-ink: #151515;
-      --mmood-muted: #69718a;
-      --mmood-track: #e8eaf0;
-      --mmood-error: #b42318;
-      --mmood-white: #ffffff;
-      --app-max-width: 1180px;
+      --mmood-blue:#0b2f5b;
+      --mmood-blue-soft:#eaf1f8;
+      --mmood-blue-selected:#eef4fa;
+      --mmood-blue-border:#bfd1e3;
+      --mmood-ink:#151515;
+      --mmood-muted:#69718a;
+      --mmood-track:#e8eaf0;
+      --mmood-error:#b42318;
+      --mmood-positive:#14823b;
+      --mmood-white:#ffffff;
+      --app-max-width:1180px;
     }
 
-    *, *::before, *::after {
-      box-sizing: border-box;
+    *,*::before,*::after{box-sizing:border-box}
+
+    html,body{
+      width:100%;
+      margin:0;
+      padding:0;
+      background:var(--mmood-white);
     }
 
-    html,
-    body {
-      width: 100%;
-      margin: 0;
-      padding: 0;
-      background: var(--mmood-white);
+    body{
+      color:var(--mmood-ink);
+      font-family:'Lato',Arial,sans-serif;
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
     }
 
-    body {
-      color: var(--mmood-ink);
-      font-family: 'Lato', Arial, sans-serif;
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
+    button,textarea{font:inherit}
+
+    #fit{width:100%;padding:1px}
+
+    #app{
+      width:min(calc(100% - 10px),var(--app-max-width));
+      margin:0 auto;
+      padding:12px 2px 20px;
     }
 
-    #fit {
-      width: 100%;
-      padding: 1px;
+    .app-header{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:10px;
     }
 
-    #app {
-      width: min(calc(100% - 10px), var(--app-max-width));
-      margin: 0 auto;
-      padding: 12px 2px 18px;
+    h1,p{margin:0}
+
+    h1{
+      color:var(--mmood-ink);
+      font-size:25px;
+      font-weight:400;
+      line-height:1.1;
     }
 
-    .app-header {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 10px;
+    .data-state{
+      display:inline-flex;
+      flex:0 0 auto;
+      align-items:center;
+      gap:5px;
+      min-height:20px;
+      color:var(--mmood-muted);
+      font-size:11px;
+      line-height:1;
+      white-space:nowrap;
     }
 
-    h1,
-    p {
-      margin: 0;
+    .data-state-dot{
+      width:7px;
+      height:7px;
+      border-radius:50%;
+      background:var(--mmood-muted);
     }
 
-    h1 {
-      color: var(--mmood-ink);
-      font-size: 25px;
-      font-weight: 400;
-      line-height: 1.1;
-    }
+    .data-state.is-live .data-state-dot{background:#e53935}
+    .data-state.is-saving .data-state-dot{background:#c27c00}
+    .data-state.is-error{color:var(--mmood-error)}
+    .data-state.is-error .data-state-dot{background:var(--mmood-error)}
 
-    .data-state {
-      display: inline-flex;
-      flex: 0 0 auto;
-      align-items: center;
-      gap: 5px;
-      min-height: 20px;
-      color: var(--mmood-muted);
-      font-size: 11px;
-      line-height: 1;
-      white-space: nowrap;
-    }
-
-    .data-state-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--mmood-muted);
-    }
-
-    .data-state.is-live .data-state-dot {
-      background: #e53935;
-    }
-
-    .data-state.is-error {
-      color: var(--mmood-error);
-    }
-
-    .data-state.is-error .data-state-dot {
-      background: var(--mmood-error);
-    }
-
-    .gradient-line {
-      height: 2px;
-      margin: 10px 0 14px;
-      background: linear-gradient(
+    .gradient-line{
+      height:2px;
+      margin:10px 0 14px;
+      background:linear-gradient(
         90deg,
         var(--mmood-white) 0%,
         var(--mmood-blue) 50%,
@@ -116,195 +103,308 @@
       );
     }
 
-    .table-meta {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      min-height: 22px;
-      margin-bottom: 6px;
-      color: var(--mmood-muted);
-      font-size: 12px;
-      line-height: 1.3;
+    .table-meta{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      min-height:22px;
+      margin-bottom:6px;
     }
 
-    .table-count {
-      font-variant-numeric: tabular-nums;
+    .table-hint,
+    .table-count{
+      color:var(--mmood-muted);
+      font-size:12px;
+      line-height:1.3;
     }
 
-    .table-shell {
-      position: relative;
-      width: 100%;
-      overflow: hidden;
-      background: var(--mmood-white);
-      border-top: 1px solid var(--mmood-track);
-      border-bottom: 1px solid var(--mmood-track);
+    .table-count{
+      flex:0 0 auto;
+      font-variant-numeric:tabular-nums;
+      white-space:nowrap;
     }
 
-    .table-scroll {
-      width: 100%;
-      max-height: 72vh;
-      overflow: auto;
-      overscroll-behavior: contain;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(105, 113, 138, 0.35) transparent;
+    .table-shell{
+      position:relative;
+      width:100%;
+      overflow:hidden;
+      background:var(--mmood-white);
+      border-top:1px solid var(--mmood-track);
+      border-bottom:1px solid var(--mmood-track);
     }
 
-    table {
-      width: 100%;
-      min-width: 1120px;
-      border-collapse: separate;
-      border-spacing: 0;
-      table-layout: fixed;
+    .table-scroll{
+      width:100%;
+      max-height:72vh;
+      overflow:auto;
+      overscroll-behavior:contain;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:thin;
+      scrollbar-color:rgba(105,113,138,.35) transparent;
     }
 
-    col.date { width: 105px; }
-    col.situation { width: 220px; }
-    col.awareness { width: 180px; }
-    col.analysis { width: 285px; }
-    col.challenge { width: 180px; }
-    col.replace { width: 250px; }
-
-    th,
-    td {
-      padding: 10px 11px;
-      border-right: 1px solid var(--mmood-track);
-      border-bottom: 1px solid var(--mmood-track);
-      text-align: left;
-      vertical-align: top;
+    table{
+      width:100%;
+      min-width:1120px;
+      border-collapse:separate;
+      border-spacing:0;
+      table-layout:fixed;
     }
 
-    th:last-child,
-    td:last-child {
-      border-right: 0;
+    col.date{width:105px}
+    col.situation{width:220px}
+    col.awareness{width:180px}
+    col.analysis{width:285px}
+    col.challenge{width:180px}
+    col.replace{width:250px}
+
+    th,td{
+      padding:10px 11px;
+      border-right:1px solid var(--mmood-track);
+      border-bottom:1px solid var(--mmood-track);
+      text-align:left;
+      vertical-align:top;
     }
 
-    thead th {
-      position: sticky;
-      top: 0;
-      z-index: 4;
-      color: var(--mmood-muted);
-      background: var(--mmood-white);
-      border-bottom: 1px solid var(--mmood-ink);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      line-height: 1.2;
-      text-transform: uppercase;
+    th:last-child,td:last-child{border-right:0}
+
+    thead th{
+      position:sticky;
+      top:0;
+      z-index:5;
+      color:var(--mmood-muted);
+      background:var(--mmood-white);
+      border-bottom:1px solid var(--mmood-ink);
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:.02em;
+      line-height:1.2;
+      text-transform:uppercase;
     }
 
-    tbody td {
-      color: var(--mmood-ink);
-      background: var(--mmood-white);
-      font-size: 13px;
-      line-height: 1.45;
-      white-space: normal;
-      overflow-wrap: anywhere;
+    tbody td{
+      color:var(--mmood-ink);
+      background:var(--mmood-white);
+      font-size:13px;
+      line-height:1.45;
+      white-space:normal;
+      overflow-wrap:anywhere;
     }
 
-    tbody tr:nth-child(even) td {
-      background: #fbfcfd;
-    }
-
-    tbody tr:hover td {
-      background: var(--mmood-blue-selected);
-    }
+    tbody tr.data-row:nth-child(odd) td{background:#fbfcfd}
+    tbody tr.data-row:hover td{background:var(--mmood-blue-selected)}
 
     thead th:first-child,
-    tbody td:first-child {
-      position: sticky;
-      left: 0;
-      z-index: 3;
-      box-shadow: 1px 0 0 var(--mmood-track);
+    tbody td:first-child{
+      position:sticky;
+      left:0;
+      z-index:3;
+      box-shadow:1px 0 0 var(--mmood-track);
     }
 
-    thead th:first-child {
-      z-index: 5;
+    thead th:first-child{z-index:6}
+    tbody tr.data-row:nth-child(odd) td:first-child{background:#fbfcfd}
+    tbody tr.data-row:hover td:first-child{background:var(--mmood-blue-selected)}
+
+    .date-cell{
+      color:var(--mmood-muted);
+      font-size:12px;
+      white-space:nowrap;
+      font-variant-numeric:tabular-nums;
     }
 
-    tbody tr:nth-child(even) td:first-child {
-      background: #fbfcfd;
+    /* New-entry row stays directly below the sticky heading. */
+    .new-entry-row td{
+      position:sticky;
+      top:33px;
+      z-index:4;
+      padding:6px;
+      background:#fbfdff;
+      border-bottom:1px solid var(--mmood-blue-border);
+      vertical-align:top;
     }
 
-    tbody tr:hover td:first-child {
-      background: var(--mmood-blue-selected);
+    .new-entry-row td:first-child{
+      z-index:5;
+      background:#fbfdff;
     }
 
-    .date-cell {
-      color: var(--mmood-muted);
-      font-size: 12px;
-      white-space: nowrap;
-      font-variant-numeric: tabular-nums;
+    .new-entry-marker{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      min-height:31px;
+      padding:0 4px;
+      color:var(--mmood-blue);
+      font-size:11px;
+      font-weight:700;
+      white-space:nowrap;
     }
+
+    .plus-mark{
+      display:inline-flex;
+      width:22px;
+      height:22px;
+      align-items:center;
+      justify-content:center;
+      border:1px solid var(--mmood-blue-border);
+      border-radius:50%;
+      background:var(--mmood-blue-soft);
+      color:var(--mmood-blue);
+      font-size:17px;
+      font-weight:400;
+      line-height:1;
+    }
+
+    .entry-input{
+      display:block;
+      width:100%;
+      min-height:50px;
+      max-height:180px;
+      resize:none;
+      overflow-y:auto;
+      padding:7px 7px;
+      color:var(--mmood-ink);
+      background:transparent;
+      border:1px solid transparent;
+      border-radius:5px;
+      outline:none;
+      font-size:13px;
+      line-height:1.4;
+      transition:background-color 110ms ease,border-color 110ms ease;
+    }
+
+    .entry-input::placeholder{color:#9aa1b2}
+
+    .entry-input:focus{
+      background:var(--mmood-white);
+      border-color:var(--mmood-blue);
+    }
+
+    .replace-editor{
+      display:flex;
+      align-items:flex-start;
+      gap:6px;
+    }
+
+    .replace-editor .entry-input{min-width:0}
+
+    .save-button{
+      flex:0 0 auto;
+      min-width:54px;
+      height:32px;
+      margin-top:1px;
+      padding:0 10px;
+      color:var(--mmood-white);
+      background:var(--mmood-ink);
+      border:1px solid var(--mmood-ink);
+      border-radius:5px;
+      cursor:pointer;
+      font-size:11px;
+      font-weight:700;
+      transition:
+        background-color 110ms ease,
+        border-color 110ms ease,
+        opacity 110ms ease,
+        transform 110ms cubic-bezier(.22,1,.36,1);
+    }
+
+    .save-button:hover,
+    .save-button:focus-visible{
+      background:var(--mmood-blue);
+      border-color:var(--mmood-blue);
+      outline:none;
+      transform:translateY(-1px);
+    }
+
+    .save-button:disabled{
+      cursor:wait;
+      opacity:.5;
+      transform:none;
+    }
+
+    .status-row td{
+      padding:5px 8px;
+      background:var(--mmood-white);
+      border-bottom:1px solid var(--mmood-track);
+    }
+
+    .entry-status{
+      min-height:16px;
+      color:var(--mmood-muted);
+      font-size:11px;
+      line-height:1.35;
+    }
+
+    .entry-status.is-success{color:var(--mmood-positive)}
+    .entry-status.is-error{color:var(--mmood-error)}
 
     .empty-state,
     .error-state,
-    .loading-state {
-      padding: 28px 16px;
-      color: var(--mmood-muted);
-      font-size: 13px;
-      line-height: 1.5;
-      text-align: center;
+    .loading-state{
+      padding:28px 16px;
+      color:var(--mmood-muted);
+      font-size:13px;
+      line-height:1.5;
+      text-align:center;
     }
 
-    .error-state {
-      color: var(--mmood-error);
+    .error-state{color:var(--mmood-error)}
+
+    .loading-bar{
+      height:2px;
+      overflow:hidden;
+      background:var(--mmood-track);
     }
 
-    .loading-bar {
-      height: 2px;
-      overflow: hidden;
-      background: var(--mmood-track);
+    .loading-bar::after{
+      content:'';
+      display:block;
+      width:35%;
+      height:100%;
+      background:var(--mmood-blue);
+      animation:loading 1.1s ease-in-out infinite;
     }
 
-    .loading-bar::after {
-      content: '';
-      display: block;
-      width: 35%;
-      height: 100%;
-      background: var(--mmood-blue);
-      animation: loading 1.1s ease-in-out infinite;
+    @keyframes loading{
+      0%{transform:translateX(-120%)}
+      100%{transform:translateX(360%)}
     }
 
-    @keyframes loading {
-      0% { transform: translateX(-120%); }
-      100% { transform: translateX(360%); }
+    @media(max-width:700px){
+      #app{
+        width:min(calc(100% - 6px),var(--app-max-width));
+        padding-top:8px;
+      }
+
+      h1{font-size:22px}
+      .app-header{align-items:center}
+      th,td{padding:9px}
+      tbody td{font-size:12px}
+      .new-entry-row td{top:32px}
+      .entry-input{font-size:12px}
     }
 
-    @media (max-width: 640px) {
-      #app {
-        width: min(calc(100% - 6px), var(--app-max-width));
-        padding-top: 8px;
+    @media(max-width:430px){
+      .app-header{
+        align-items:flex-start;
+        flex-direction:column;
+        gap:5px;
       }
 
-      h1 {
-        font-size: 22px;
-      }
-
-      .app-header {
-        align-items: center;
-      }
-
-      .table-meta {
-        font-size: 11px;
-      }
-
-      th,
-      td {
-        padding: 9px 9px;
-      }
-
-      tbody td {
-        font-size: 12px;
+      .table-meta{
+        align-items:flex-start;
+        flex-direction:column;
+        gap:3px;
       }
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        scroll-behavior: auto !important;
+    @media(prefers-reduced-motion:reduce){
+      *,*::before,*::after{
+        animation-duration:.01ms!important;
+        animation-iteration-count:1!important;
+        scroll-behavior:auto!important;
       }
     }
   </style>
@@ -314,7 +414,7 @@
   <div id="fit">
     <main id="app">
       <header class="app-header">
-        <h1>Thought record</h1>
+        <h1>Helpful Thinking Worksheet</h1>
 
         <div id="dataState" class="data-state" aria-live="polite">
           <span class="data-state-dot" aria-hidden="true"></span>
@@ -325,34 +425,109 @@
       <div class="gradient-line" aria-hidden="true"></div>
 
       <div class="table-meta">
+        <p class="table-hint">Use the first row to add an entry. Date is added automatically.</p>
         <span id="tableCount" class="table-count">Loading entries…</span>
-        <span>Sheet1</span>
       </div>
 
       <div class="table-shell">
         <div id="loadingBar" class="loading-bar" aria-hidden="true"></div>
 
-        <div class="table-scroll" tabindex="0" aria-label="Thought record table">
-          <table>
-            <colgroup>
-              <col class="date">
-              <col class="situation">
-              <col class="awareness">
-              <col class="analysis">
-              <col class="challenge">
-              <col class="replace">
-            </colgroup>
+        <div class="table-scroll" tabindex="0" aria-label="Helpful Thinking Worksheet">
+          <form id="entryForm">
+            <table>
+              <colgroup>
+                <col class="date">
+                <col class="situation">
+                <col class="awareness">
+                <col class="analysis">
+                <col class="challenge">
+                <col class="replace">
+              </colgroup>
 
-            <thead>
-              <tr id="tableHead"></tr>
-            </thead>
+              <thead>
+                <tr id="tableHead"></tr>
+              </thead>
 
-            <tbody id="tableBody">
-              <tr>
-                <td colspan="6" class="loading-state">Loading entries…</td>
-              </tr>
-            </tbody>
-          </table>
+              <tbody id="tableBody">
+                <tr class="new-entry-row">
+                  <td>
+                    <div class="new-entry-marker" title="New entry">
+                      <span class="plus-mark" aria-hidden="true">+</span>
+                      <span id="todayLabel">Today</span>
+                    </div>
+                  </td>
+
+                  <td>
+                    <textarea
+                      id="situation"
+                      class="entry-input"
+                      maxlength="5000"
+                      placeholder="Type here…"
+                      aria-label="New entry: Situation"
+                    ></textarea>
+                  </td>
+
+                  <td>
+                    <textarea
+                      id="awareness"
+                      class="entry-input"
+                      maxlength="5000"
+                      placeholder="Type here…"
+                      aria-label="New entry: Awareness"
+                    ></textarea>
+                  </td>
+
+                  <td>
+                    <textarea
+                      id="selfAnalysis"
+                      class="entry-input"
+                      maxlength="5000"
+                      placeholder="Type here…"
+                      aria-label="New entry: Self-analysis"
+                    ></textarea>
+                  </td>
+
+                  <td>
+                    <textarea
+                      id="challenge"
+                      class="entry-input"
+                      maxlength="5000"
+                      placeholder="Type here…"
+                      aria-label="New entry: Challenge"
+                    ></textarea>
+                  </td>
+
+                  <td>
+                    <div class="replace-editor">
+                      <textarea
+                        id="replace"
+                        class="entry-input"
+                        maxlength="5000"
+                        placeholder="Type here…"
+                        aria-label="New entry: Replace"
+                      ></textarea>
+
+                      <button id="saveButton" class="save-button" type="submit">
+                        Save
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <tr class="status-row">
+                  <td colspan="6">
+                    <div id="entryStatus" class="entry-status" aria-live="polite">
+                      Newest entries appear first.
+                    </div>
+                  </td>
+                </tr>
+
+                <tr id="loadingRow">
+                  <td colspan="6" class="loading-state">Loading entries…</td>
+                </tr>
+              </tbody>
+            </table>
+          </form>
         </div>
       </div>
     </main>
@@ -363,6 +538,8 @@
       'use strict';
 
       const REFRESH_MS = 60000;
+      const BRIDGE_TIMEOUT_MS = 10000;
+
       const FALLBACK_HEADERS = [
         'Date',
         'Situation',
@@ -378,13 +555,37 @@
         tableCount: document.getElementById('tableCount'),
         tableHead: document.getElementById('tableHead'),
         tableBody: document.getElementById('tableBody'),
-        loadingBar: document.getElementById('loadingBar')
+        loadingBar: document.getElementById('loadingBar'),
+        loadingRow: document.getElementById('loadingRow'),
+        entryForm: document.getElementById('entryForm'),
+        situation: document.getElementById('situation'),
+        awareness: document.getElementById('awareness'),
+        selfAnalysis: document.getElementById('selfAnalysis'),
+        challenge: document.getElementById('challenge'),
+        replace: document.getElementById('replace'),
+        saveButton: document.getElementById('saveButton'),
+        entryStatus: document.getElementById('entryStatus'),
+        todayLabel: document.getElementById('todayLabel')
       };
+
+      let bridgeTimeout = null;
+      let saveInProgress = false;
+
+      function hasAppsScriptBridge() {
+        return Boolean(window.google && google.script && google.script.run);
+      }
 
       function setDataState(mode, text) {
         els.dataState.classList.toggle('is-live', mode === 'live');
+        els.dataState.classList.toggle('is-saving', mode === 'saving');
         els.dataState.classList.toggle('is-error', mode === 'error');
         els.dataStateText.textContent = text;
+      }
+
+      function setEntryStatus(text, mode = '') {
+        els.entryStatus.classList.toggle('is-success', mode === 'success');
+        els.entryStatus.classList.toggle('is-error', mode === 'error');
+        els.entryStatus.textContent = text;
       }
 
       function setLoading(isLoading) {
@@ -404,15 +605,26 @@
           });
       }
 
+      function removeDataRows() {
+        els.tableBody.querySelectorAll('.data-row, .empty-data-row, .error-data-row')
+          .forEach(row => row.remove());
+
+        const loadingRow = document.getElementById('loadingRow');
+        if (loadingRow) loadingRow.remove();
+      }
+
       function renderRows(rows) {
-        els.tableBody.innerHTML = '';
+        removeDataRows();
 
         if (!rows.length) {
           const tr = document.createElement('tr');
+          tr.className = 'empty-data-row';
+
           const td = document.createElement('td');
           td.colSpan = 6;
           td.className = 'empty-state';
-          td.textContent = 'No entries yet';
+          td.textContent = 'No saved entries yet';
+
           tr.appendChild(td);
           els.tableBody.appendChild(tr);
           els.tableCount.textContent = '0 entries';
@@ -423,16 +635,13 @@
 
         rows.forEach(row => {
           const tr = document.createElement('tr');
+          tr.className = 'data-row';
 
           for (let index = 0; index < 6; index += 1) {
             const td = document.createElement('td');
-            const value = row[index] == null ? '' : String(row[index]);
+            td.textContent = row[index] == null ? '' : String(row[index]);
 
-            td.textContent = value;
-
-            if (index === 0) {
-              td.className = 'date-cell';
-            }
+            if (index === 0) td.className = 'date-cell';
 
             tr.appendChild(td);
           }
@@ -441,48 +650,178 @@
         });
 
         els.tableBody.appendChild(fragment);
-        els.tableCount.textContent = rows.length + (rows.length === 1 ? ' entry' : ' entries');
+        els.tableCount.textContent =
+          rows.length + (rows.length === 1 ? ' entry' : ' entries');
       }
 
-      function renderError(error) {
-        els.tableBody.innerHTML = '';
+      function renderPayload(payload) {
+        renderHeaders(payload?.headers || FALLBACK_HEADERS);
+        renderRows(Array.isArray(payload?.rows) ? payload.rows : []);
+
+        if (payload?.todayLabel) {
+          els.todayLabel.textContent = payload.todayLabel;
+        }
+
+        setLoading(false);
+        setDataState('live', 'LIVE data');
+      }
+
+      function renderLoadError(error) {
+        clearTimeout(bridgeTimeout);
+        setLoading(false);
+        setDataState('error', 'Data unavailable');
+        removeDataRows();
 
         const tr = document.createElement('tr');
-        const td = document.createElement('td');
+        tr.className = 'error-data-row';
 
+        const td = document.createElement('td');
         td.colSpan = 6;
         td.className = 'error-state';
-        td.textContent = 'Could not load Sheet1. ' + (error && error.message ? error.message : 'Please refresh.');
+        td.textContent =
+          'Could not load Sheet1. ' +
+          (error?.message || 'Please refresh.');
 
         tr.appendChild(td);
         els.tableBody.appendChild(tr);
-
         els.tableCount.textContent = 'Data unavailable';
-        setDataState('error', 'Data unavailable');
       }
 
-      function loadData() {
-        setLoading(true);
-        setDataState('', 'Connecting…');
+      function showWrongHostError() {
+        renderHeaders(FALLBACK_HEADERS);
+        setLoading(false);
+        setDataState('error', 'Apps Script required');
+        setEntryStatus(
+          'Open the deployed Google Apps Script web-app URL to view or save entries.',
+          'error'
+        );
+        els.saveButton.disabled = true;
+        renderLoadError({
+          message: 'This HTML file cannot connect to the spreadsheet by itself.'
+        });
+      }
+
+      function loadData({quiet = false} = {}) {
+        if (!hasAppsScriptBridge()) {
+          showWrongHostError();
+          return;
+        }
+
+        if (!quiet) {
+          setLoading(true);
+          setDataState('', 'Connecting…');
+        }
+
+        clearTimeout(bridgeTimeout);
+        bridgeTimeout = setTimeout(() => {
+          renderLoadError({message:'The Apps Script connection did not respond.'});
+        }, BRIDGE_TIMEOUT_MS);
 
         google.script.run
           .withSuccessHandler(payload => {
-            renderHeaders(payload && payload.headers ? payload.headers : FALLBACK_HEADERS);
-            renderRows(payload && Array.isArray(payload.rows) ? payload.rows : []);
-            setDataState('live', 'LIVE data');
-            setLoading(false);
+            clearTimeout(bridgeTimeout);
+            renderPayload(payload);
           })
           .withFailureHandler(error => {
-            renderHeaders(FALLBACK_HEADERS);
-            renderError(error);
-            setLoading(false);
+            clearTimeout(bridgeTimeout);
+            renderLoadError(error);
           })
-          .getThoughtRecordData();
+          .getHelpfulThinkingData();
       }
 
+      function currentEntry() {
+        return {
+          situation: els.situation.value.trim(),
+          awareness: els.awareness.value.trim(),
+          selfAnalysis: els.selfAnalysis.value.trim(),
+          challenge: els.challenge.value.trim(),
+          replace: els.replace.value.trim()
+        };
+      }
+
+      function clearInputs() {
+        [els.situation, els.awareness, els.selfAnalysis, els.challenge, els.replace]
+          .forEach(input => {
+            input.value = '';
+            input.style.height = '';
+          });
+      }
+
+      function saveEntry(event) {
+        event.preventDefault();
+
+        if (saveInProgress) return;
+
+        if (!hasAppsScriptBridge()) {
+          showWrongHostError();
+          return;
+        }
+
+        const entry = currentEntry();
+
+        if (!Object.values(entry).some(Boolean)) {
+          setEntryStatus('Type something into the new row before saving.', 'error');
+          els.situation.focus();
+          return;
+        }
+
+        saveInProgress = true;
+        els.saveButton.disabled = true;
+        els.saveButton.textContent = 'Saving…';
+        setDataState('saving', 'Saving…');
+        setEntryStatus('Saving entry…');
+
+        google.script.run
+          .withSuccessHandler(payload => {
+            saveInProgress = false;
+            els.saveButton.disabled = false;
+            els.saveButton.textContent = 'Save';
+            clearInputs();
+            renderPayload(payload);
+            setEntryStatus('Saved. Newest entries appear first.', 'success');
+            els.situation.focus();
+          })
+          .withFailureHandler(error => {
+            saveInProgress = false;
+            els.saveButton.disabled = false;
+            els.saveButton.textContent = 'Save';
+            setDataState('error', 'Save failed');
+            setEntryStatus(
+              'Could not save. ' + (error?.message || 'Please try again.'),
+              'error'
+            );
+          })
+          .addHelpfulThinkingEntry(entry);
+      }
+
+      function autoGrow(textarea) {
+        textarea.style.height = 'auto';
+        textarea.style.height = Math.min(textarea.scrollHeight, 180) + 'px';
+      }
+
+      document.querySelectorAll('.entry-input').forEach(textarea => {
+        textarea.addEventListener('input', () => autoGrow(textarea));
+
+        textarea.addEventListener('keydown', event => {
+          if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+            event.preventDefault();
+            els.entryForm.requestSubmit();
+          }
+        });
+      });
+
       renderHeaders(FALLBACK_HEADERS);
-      loadData();
-      window.setInterval(loadData, REFRESH_MS);
+      els.entryForm.addEventListener('submit', saveEntry);
+
+      if (hasAppsScriptBridge()) {
+        loadData();
+
+        setInterval(() => {
+          if (!saveInProgress) loadData({quiet:true});
+        }, REFRESH_MS);
+      } else {
+        showWrongHostError();
+      }
     })();
   </script>
 </body>
