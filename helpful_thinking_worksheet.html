@@ -109,7 +109,6 @@
       width:100%;
       overflow:hidden;
       background:var(--mmood-white);
-      border-top:1px solid var(--mmood-track);
       border-bottom:1px solid var(--mmood-track);
     }
 
@@ -387,10 +386,7 @@
         max-height:none;
         overflow:visible;
       }
-      .table-shell{
-        overflow:visible;
-        border-top:0; /* The Mmood gradient is already the section divider. */
-      }
+      .table-shell{overflow:visible}
       table{
         display:block;
         width:100%;
@@ -476,6 +472,8 @@
         border:0;
         box-shadow:none;
       }
+      /* The collapsed mobile toggle already shows + and today's date. */
+      .new-entry-row td:first-child{display:none}
       .new-entry-row td:not(:first-child)::before{
         display:block;
         content:attr(data-label);
