@@ -92,15 +92,7 @@
     }
 
     .data-state {
-      display: inline-flex;
-      flex: 0 0 auto;
-      align-items: center;
-      gap: 5px;
-      min-height: 20px;
-      color: var(--mmood-muted);
-      font-size: 11px;
-      line-height: 1;
-      white-space: nowrap;
+      display: none;
     }
 
     .data-state-dot {
@@ -1584,10 +1576,6 @@
 
         state.pendingNotePositions =
           null
-
-        scrollSelectedNoteIntoView(
-          false
-        )
       }
 
       function selectEntry(
@@ -1671,16 +1659,26 @@
               '"]'
           )
 
-        /*
-         * No matching row is normal if
-         * the selected mood has no note
-         */
         if (!item) {
           return
         }
 
-        item.scrollIntoView({
-          block: 'nearest',
+        const list = els.notesList
+        const listRect = list.getBoundingClientRect()
+        const itemRect = item.getBoundingClientRect()
+
+        let targetTop = list.scrollTop
+
+        if (itemRect.top < listRect.top) {
+          targetTop += itemRect.top - listRect.top
+        } else if (itemRect.bottom > listRect.bottom) {
+          targetTop += itemRect.bottom - listRect.bottom
+        } else {
+          return
+        }
+
+        list.scrollTo({
+          top: Math.max(0, targetTop),
 
           behavior:
             smooth &&
