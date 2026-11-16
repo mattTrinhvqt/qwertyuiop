@@ -23,6 +23,7 @@
       --mmood-positive:#14823b;
       --mmood-white:#ffffff;
       --app-max-width:1180px;
+      --mmood-motion-ease:cubic-bezier(0.22,1,0.36,1);
     }
 
     *,*::before,*::after{box-sizing:border-box}
@@ -48,7 +49,7 @@
     #app{
       width:min(calc(100% - 10px),var(--app-max-width));
       margin:0 auto;
-      padding:12px 2px 20px;
+      padding:12px 2px 18px;
     }
 
     .app-header{
@@ -94,34 +95,13 @@
 
     .gradient-line{
       height:2px;
-      margin:10px 0 14px;
+      margin:10px 0 16px;
       background:linear-gradient(
         90deg,
         var(--mmood-white) 0%,
         var(--mmood-blue) 50%,
         var(--mmood-white) 100%
       );
-    }
-
-    .table-meta{
-      display:flex;
-      align-items:center;
-      justify-content:flex-end;
-      gap:12px;
-      min-height:22px;
-      margin-bottom:6px;
-    }
-
-    .table-count{
-      color:var(--mmood-muted);
-      font-size:12px;
-      line-height:1.3;
-    }
-
-    .table-count{
-      flex:0 0 auto;
-      font-variant-numeric:tabular-nums;
-      white-space:nowrap;
     }
 
     .table-shell{
@@ -135,9 +115,11 @@
 
     .table-scroll{
       width:100%;
-      max-height:72vh;
-      overflow:auto;
-      overscroll-behavior:contain;
+      /* No nested height-limited scroller: let Google Sites / the page
+         control vertical scrolling, not the table and the iframe both. */
+      max-height:none;
+      overflow-x:auto;
+      overflow-y:visible;
       -webkit-overflow-scrolling:touch;
       scrollbar-width:thin;
       scrollbar-color:rgba(105,113,138,.35) transparent;
@@ -148,14 +130,14 @@
       min-width:100%;
       border-collapse:separate;
       border-spacing:0;
-      table-layout:auto;
+      table-layout:fixed;
     }
 
-    /* Column widths are recalculated from saved content on every data refresh. */
-    col.date{width:94px}
+    /* A compact date column and content-led widths calculated in JS. */
+    col.date{width:100px}
 
     th,td{
-      padding:10px 11px;
+      padding:8px 5px;
       border-right:1px solid var(--mmood-track);
       border-bottom:1px solid var(--mmood-track);
       text-align:left;
@@ -189,7 +171,6 @@
       hyphens:auto;
     }
 
-    tbody tr.data-row:nth-child(odd) td{background:#fbfcfd}
     tbody tr.data-row:hover td{background:var(--mmood-blue-selected)}
 
     thead th:first-child,
@@ -201,12 +182,11 @@
     }
 
     thead th:first-child{z-index:6}
-    tbody tr.data-row:nth-child(odd) td:first-child{background:#fbfcfd}
     tbody tr.data-row:hover td:first-child{background:var(--mmood-blue-selected)}
 
     .date-cell{
       width:1%;
-      min-width:92px;
+      min-width:90px;
       color:var(--mmood-muted);
       font-size:12px;
       white-space:nowrap;
@@ -224,15 +204,15 @@
       position:sticky;
       top:var(--table-head-height, 33px);
       z-index:4;
-      padding:6px;
-      background:#fbfdff;
+      padding:5px;
+      background:var(--mmood-white);
       border-bottom:1px solid var(--mmood-blue-border);
       vertical-align:top;
     }
 
     .new-entry-row td:first-child{
       z-index:5;
-      background:#fbfdff;
+      background:var(--mmood-white);
     }
 
     .new-entry-marker{
@@ -240,7 +220,7 @@
       align-items:center;
       gap:6px;
       min-height:31px;
-      padding:0 4px;
+      padding:0 2px;
       color:var(--mmood-blue);
       font-size:11px;
       font-weight:700;
@@ -270,7 +250,7 @@
       min-width:0;
       resize:none;
       overflow-y:auto;
-      padding:7px 7px;
+      padding:5px 3px;
       color:var(--mmood-ink);
       background:transparent;
       border:1px solid transparent;
@@ -286,6 +266,11 @@
     .entry-input:focus{
       background:var(--mmood-white);
       border-color:var(--mmood-blue);
+    }
+
+    .entry-input:focus-visible{
+      outline:2px solid var(--mmood-blue);
+      outline-offset:1px;
     }
 
     .replace-editor{
@@ -313,7 +298,7 @@
         background-color 110ms ease,
         border-color 110ms ease,
         opacity 110ms ease,
-        transform 110ms cubic-bezier(.22,1,.36,1);
+        transform 110ms var(--mmood-motion-ease);
     }
 
     .save-button:hover,
@@ -330,19 +315,15 @@
       transform:none;
     }
 
-    .status-row td{
-      padding:5px 8px;
-      background:var(--mmood-white);
-      border-bottom:1px solid var(--mmood-track);
-    }
-
+    /* Feedback is invisible until saving or an error. No permanent status row. */
     .entry-status{
-      min-height:16px;
+      margin:5px 2px 0;
       color:var(--mmood-muted);
       font-size:11px;
       line-height:1.35;
     }
 
+    .entry-status[hidden]{display:none}
     .entry-status.is-success{color:var(--mmood-positive)}
     .entry-status.is-error{color:var(--mmood-error)}
 
@@ -387,22 +368,126 @@
       pointer-events:none;
     }
 
+    /* At phone/tablet widths, preserve the worksheet as one continuous
+       full-width reading surface. Each saved row is a labelled mini-table,
+       and the entry row uses the same labels; there is NO sideways scroll. */
     @media(max-width:700px){
-      /* Six editable fields cannot remain comfortably usable below this width,
-         so horizontal scrolling is enabled only on genuinely narrow screens. */
-      table{min-width:720px}
-
       #app{
-        width:min(calc(100% - 6px),var(--app-max-width));
-        padding-top:8px;
+        width:min(calc(100% - 8px),var(--app-max-width));
+        padding-top:9px;
       }
 
       h1{font-size:22px}
       .app-header{align-items:center}
-      th,td{padding:9px}
-      tbody td{font-size:12px}
-      .new-entry-row td{top:var(--table-head-height, 32px)}
-      .entry-input{font-size:12px}
+      .table-scroll{
+        width:100%;
+        max-height:none;
+        overflow:visible;
+      }
+      .table-shell{overflow:visible}
+      table{
+        display:block;
+        width:100%;
+        min-width:0;
+        table-layout:auto;
+      }
+      colgroup,thead{display:none}
+      tbody{display:block;width:100%}
+      tbody tr{display:block;width:100%}
+
+      .new-entry-row{
+        display:grid;
+        grid-template-columns:minmax(0,1fr);
+        padding:6px 6px 9px;
+        background:var(--mmood-white);
+        border-bottom:1px solid var(--mmood-blue-border);
+      }
+      .new-entry-row td,
+      .new-entry-row td:first-child{
+        display:block;
+        position:static;
+        top:auto;
+        z-index:auto;
+        width:100%;
+        min-width:0;
+        padding:4px 2px;
+        background:var(--mmood-white);
+        border:0;
+        box-shadow:none;
+      }
+      .new-entry-row td:not(:first-child)::before{
+        display:block;
+        content:attr(data-label);
+        margin:0 0 1px;
+        color:var(--mmood-muted);
+        font-size:10px;
+        font-weight:700;
+        line-height:1.3;
+      }
+      .new-entry-marker{min-height:27px;padding:0 1px}
+      .plus-mark{width:20px;height:20px;font-size:16px}
+      .entry-input{
+        width:100%;
+        height:38px;
+        min-height:38px;
+        max-height:none;
+        padding:7px 8px;
+        font-size:13px;
+        line-height:1.4;
+        border:1px solid var(--mmood-track);
+        border-radius:5px;
+        overflow:hidden;
+      }
+      .replace-editor{display:flex;flex-direction:column;gap:7px}
+      .replace-editor .entry-input{flex:0 0 auto}
+      .save-button{
+        align-self:flex-end;
+        margin:0;
+        height:35px;
+        min-width:86px;
+      }
+      .entry-status{margin:5px 2px 0}
+
+      .data-row{
+        padding:7px 6px;
+        border-bottom:1px solid var(--mmood-track);
+      }
+      .data-row td,
+      .data-row td:first-child{
+        display:grid;
+        grid-template-columns:90px minmax(0,1fr);
+        gap:7px;
+        position:static;
+        z-index:auto;
+        width:100%;
+        min-width:0;
+        padding:4px 2px;
+        border:0;
+        box-shadow:none;
+        background:transparent!important;
+        color:var(--mmood-ink);
+        text-align:left;
+        font-size:12px;
+        line-height:1.35;
+        white-space:normal;
+        overflow-wrap:anywhere;
+      }
+      .data-row td::before{
+        content:attr(data-label);
+        color:var(--mmood-muted);
+        font-size:10px;
+        font-weight:700;
+        line-height:1.4;
+      }
+      .data-row .date-cell{color:var(--mmood-blue)}
+      .data-row .empty-cell{color:var(--mmood-muted)}
+      .data-row:hover td{background:transparent!important}
+
+      .loading-state,.empty-state,.error-state{
+        display:block;
+        padding:20px 10px;
+        border:0;
+      }
     }
 
     @media(max-width:430px){
@@ -411,12 +496,8 @@
         flex-direction:column;
         gap:5px;
       }
-
-      .table-meta{
-        align-items:flex-start;
-        flex-direction:column;
-        gap:3px;
-      }
+      .data-row td,
+      .data-row td:first-child{grid-template-columns:80px minmax(0,1fr)}
     }
 
     @media(prefers-reduced-motion:reduce){
@@ -442,10 +523,6 @@
       </header>
 
       <div class="gradient-line" aria-hidden="true"></div>
-
-      <div class="table-meta">
-        <span id="tableCount" class="table-count">Loading entries…</span>
-      </div>
 
       <div class="table-shell">
         <div id="loadingBar" class="loading-bar" aria-hidden="true"></div>
@@ -475,7 +552,7 @@
                     </div>
                   </td>
 
-                  <td>
+                  <td data-label="Situation">
                     <textarea
                       id="situation"
                       class="entry-input"
@@ -485,7 +562,7 @@
                     ></textarea>
                   </td>
 
-                  <td>
+                  <td data-label="Awareness">
                     <textarea
                       id="awareness"
                       class="entry-input"
@@ -495,7 +572,7 @@
                     ></textarea>
                   </td>
 
-                  <td>
+                  <td data-label="Self-analysis">
                     <textarea
                       id="selfAnalysis"
                       class="entry-input"
@@ -505,7 +582,7 @@
                     ></textarea>
                   </td>
 
-                  <td>
+                  <td data-label="Challenge">
                     <textarea
                       id="challenge"
                       class="entry-input"
@@ -515,7 +592,7 @@
                     ></textarea>
                   </td>
 
-                  <td>
+                  <td data-label="Replace">
                     <div class="replace-editor">
                       <textarea
                         id="replace"
@@ -529,14 +606,7 @@
                         Save
                       </button>
                     </div>
-                  </td>
-                </tr>
-
-                <tr class="status-row">
-                  <td colspan="6">
-                    <div id="entryStatus" class="entry-status" aria-live="polite">
-                      Newest entries appear first.
-                    </div>
+                    <div id="entryStatus" class="entry-status" role="status" aria-live="polite" hidden></div>
                   </td>
                 </tr>
 
@@ -569,7 +639,6 @@
       const els = {
         dataState: document.getElementById('dataState'),
         dataStateText: document.getElementById('dataStateText'),
-        tableCount: document.getElementById('tableCount'),
         tableHead: document.getElementById('tableHead'),
         tableBody: document.getElementById('tableBody'),
         loadingBar: document.getElementById('loadingBar'),
@@ -592,10 +661,16 @@
         els.dataStateText.textContent = message;
       }
 
+      let statusClearTimer = null;
       function setEntryStatus(message, mode = '') {
+        window.clearTimeout(statusClearTimer);
         els.entryStatus.textContent = message;
+        els.entryStatus.hidden = !message;
         els.entryStatus.classList.toggle('is-success', mode === 'success');
         els.entryStatus.classList.toggle('is-error', mode === 'error');
+        if (message && mode === 'success') {
+          statusClearTimer = window.setTimeout(() => setEntryStatus(''), 4500);
+        }
       }
 
       function setLoading(active) {
@@ -676,43 +751,66 @@
         els.tableBody.appendChild(tr);
       }
 
-      // Use a fixed viewport width but dynamically distribute that width across
-      // columns according to visible content. Empty columns stay compact.
+      // Fit the table to the actual embed width. Awareness/Challenge collapse
+      // towards heading width while unused; Situation/Self-analysis/Replace
+      // receive the reclaimed space. The editable row stays usable.
       function sizeColumns(entries) {
-        const caps=[10,36,32,44,32,42];
-        const baseline=[10,13,12,16,12,14];
-        const weights=baseline.map((base,i) => {
-          const seen=entries.slice(0,150)
-            .map(entry => String((entry.cells||[])[i]||'').trim().length)
-            .sort((a,b) => a-b);
-          const p=seen.length ? seen[Math.floor((seen.length-1)*0.8)] : 0;
-          return Math.max(base,Math.min(caps[i],p*0.65+base*0.35));
-        });
-        // The date column is always 94px; other widths are relative percentages.
-        const rest=weights.slice(1).reduce((a,b)=>a+b,0);
         const cols=document.querySelectorAll('colgroup col');
-        if(cols.length!==6)return;
-        cols[0].style.width='94px';
-        for(let i=1;i<6;i++) {
-          const fraction=weights[i]/rest;
-          cols[i].style.width=`calc(${(fraction*100).toFixed(3)}% - ${(fraction*94).toFixed(2)}px)`;
-        }
+        const table=document.querySelector('.table-scroll table');
+        if(cols.length!==6 || !table)return;
+
+        const width=Math.max(700,Math.floor(table.parentElement.clientWidth));
+        const dateWidth=100;
+        const lengthAt=(index)=>{
+          const lengths=entries.slice(0,500)
+            .map(entry=>String((entry.cells||[])[index]||'').trim().length)
+            .sort((a,b)=>a-b);
+          return lengths.length
+            ? lengths[Math.floor((lengths.length-1)*0.8)] : 0;
+        };
+        const populatedFraction=(index)=>{
+          if(!entries.length)return 0;
+          return entries.slice(0,500)
+            .filter(entry=>String((entry.cells||[])[index]||'').trim()!=='').length
+            /Math.min(entries.length,500);
+        };
+        const compactWidth=(index)=>{
+          if(populatedFraction(index)<0.4)return 88;
+          return Math.min(175,88+Math.max(0,lengthAt(index)-14)*2.2);
+        };
+        const awarenessWidth=compactWidth(2);
+        const challengeWidth=compactWidth(4);
+        const openWidth=Math.max(0,width-dateWidth-awarenessWidth-challengeWidth);
+        const roomy=[1,3,5];
+        const weights=roomy.map(i=>Math.max(12,Math.min(62,lengthAt(i)||0)));
+        const total=weights.reduce((a,b)=>a+b,0);
+
+        const widths=[dateWidth,0,awarenessWidth,0,challengeWidth,0];
+        roomy.forEach((index,n)=>{widths[index]=openWidth*weights[n]/total;});
+        widths.forEach((w,i)=>{cols[i].style.width=w.toFixed(2)+'px';});
+      }
+
+      function isDuplicateHeader(entry) {
+        const cells=(entry && entry.cells)||[];
+        return cells.length>=6 && HEADERS.every((heading,i)=>
+          String(cells[i]||'').trim().toLowerCase()===heading.toLowerCase()
+        );
       }
 
       function renderRows(entries) {
         removeDataRows();
+        sizeColumns(entries);
         if (!entries.length) {
           messageRow('No saved entries yet','empty-state');
-          els.tableCount.textContent='0 entries';
           return;
         }
-        sizeColumns(entries);
         const fragment=document.createDocumentFragment();
         entries.forEach(entry => {
           const row=document.createElement('tr');
           row.className='data-row';
           (entry.cells||[]).slice(0,6).forEach((raw,index) => {
             const td=document.createElement('td');
+            td.dataset.label=HEADERS[index];
             const value=raw==null?'':String(raw).trim();
             td.textContent=value||'—';
             if(index===0)td.classList.add('date-cell');
@@ -722,14 +820,13 @@
           fragment.appendChild(row);
         });
         els.tableBody.appendChild(fragment);
-        els.tableCount.textContent=entries.length+(entries.length===1?' entry':' entries');
       }
 
       function renderPayload(payload) {
         if (!payload || payload.ok !== true || !Array.isArray(payload.entries)) {
           throw new Error(payload && payload.error ? payload.error : 'Unexpected backend response.');
         }
-        state.entries=payload.entries;
+        state.entries=payload.entries.filter(entry=>!isDuplicateHeader(entry));
         state.hasLoaded=true;
         if (!state.pendingSave) els.saveButton.disabled=false;
         renderHeaders(payload.headers || HEADERS);
@@ -752,7 +849,6 @@
           setDataState('error','Unavailable');
           if(!quiet || !state.entries.length) {
             messageRow('Could not load Sheet1: '+(error.message||String(error)),'error-state');
-            els.tableCount.textContent='Data unavailable';
           }
         } finally {state.busyLoading=false;}
       }
@@ -789,7 +885,7 @@
           input.style.height='';
         });
         setDataState('live','LIVE data');
-        setEntryStatus('Saved. Newest entries appear first.','success');
+        setEntryStatus('Saved','success');
         els.situation.focus();
       }
 
@@ -859,7 +955,7 @@
           },CONFIG.saveTimeoutMs)
         };
         setSaving(true);
-        setEntryStatus('Saving…');
+        setEntryStatus('');
         const form=document.createElement('form');
         form.method='POST';
         form.action=CONFIG.backendUrl;
@@ -901,11 +997,14 @@
 
       function autoGrow(textarea) {
         textarea.style.height='auto';
-        textarea.style.height=Math.min(textarea.scrollHeight,180)+'px';
+        textarea.style.height=(window.matchMedia('(max-width:700px)').matches ? textarea.scrollHeight : Math.min(textarea.scrollHeight,180))+'px';
       }
 
       document.querySelectorAll('.entry-input').forEach(textarea=>{
-        textarea.addEventListener('input',()=>autoGrow(textarea));
+        textarea.addEventListener('input',()=>{
+          autoGrow(textarea);
+          if (!state.pendingSave && !els.entryStatus.hidden) setEntryStatus('');
+        });
         textarea.addEventListener('keydown',event=>{
           if((event.ctrlKey||event.metaKey)&&event.key==='Enter'){
             event.preventDefault();
@@ -917,7 +1016,10 @@
       renderHeaders(HEADERS);
       els.saveButton.disabled=true;
       els.entryForm.addEventListener('submit',saveEntry);
-      window.addEventListener('resize',updateStickyHeaderOffset);
+      window.addEventListener('resize',()=>{
+        updateStickyHeaderOffset();
+        sizeColumns(state.entries);
+      });
       loadEntries();
       window.setInterval(()=>{
         if(!state.pendingSave)loadEntries({quiet:true});
