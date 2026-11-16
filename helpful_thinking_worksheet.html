@@ -368,6 +368,8 @@
       pointer-events:none;
     }
 
+    .mobile-entry-toggle-row{display:none}
+
     /* At phone/tablet widths, preserve the worksheet as one continuous
        full-width reading surface. Each saved row is a labelled mini-table,
        and the entry row uses the same labels; there is NO sideways scroll. */
@@ -379,12 +381,16 @@
 
       h1{font-size:22px}
       .app-header{align-items:center}
+      .gradient-line{margin-bottom:9px}
       .table-scroll{
         width:100%;
         max-height:none;
         overflow:visible;
       }
-      .table-shell{overflow:visible}
+      .table-shell{
+        overflow:visible;
+        border-top:0; /* The Mmood gradient is already the section divider. */
+      }
       table{
         display:block;
         width:100%;
@@ -395,13 +401,68 @@
       tbody{display:block;width:100%}
       tbody tr{display:block;width:100%}
 
+      /* Compact, accessible one-line editor toggle. */
+      .mobile-entry-toggle-row{display:block}
+      .mobile-entry-toggle-row td,
+      .mobile-entry-toggle-row td:first-child{
+        display:block;
+        position:static;
+        width:100%;
+        padding:0;
+        border:0;
+        background:var(--mmood-white);
+        box-shadow:none;
+      }
+      .mobile-entry-toggle{
+        display:flex;
+        align-items:center;
+        gap:9px;
+        width:100%;
+        min-height:40px;
+        padding:6px 8px;
+        border:0;
+        border-bottom:1px solid var(--mmood-track);
+        background:var(--mmood-white);
+        color:var(--mmood-ink);
+        font-size:12px;
+        font-weight:700;
+        text-align:left;
+        cursor:pointer;
+      }
+      .mobile-entry-toggle:focus-visible{
+        outline:2px solid var(--mmood-blue);
+        outline-offset:-2px;
+      }
+      .mobile-entry-toggle:hover{background:var(--mmood-blue-selected)}
+      .mobile-entry-toggle .plus-mark{width:21px;height:21px}
+      .mobile-entry-date{
+        margin-left:auto;
+        color:var(--mmood-muted);
+        font-size:11px;
+        font-weight:400;
+        white-space:nowrap;
+      }
+      .mobile-entry-chevron{
+        width:7px;
+        height:7px;
+        margin:0 3px 3px 2px;
+        border-right:1.5px solid var(--mmood-muted);
+        border-bottom:1.5px solid var(--mmood-muted);
+        transform:rotate(45deg);
+        transition:transform 120ms ease;
+      }
+      .mobile-entry-toggle[aria-expanded="true"] .mobile-entry-chevron{
+        transform:rotate(225deg) translate(-2px,-2px);
+      }
+
       .new-entry-row{
-        display:grid;
+        display:none;
         grid-template-columns:minmax(0,1fr);
         padding:6px 6px 9px;
         background:var(--mmood-white);
         border-bottom:1px solid var(--mmood-blue-border);
       }
+      .new-entry-row.is-open{display:grid}
       .new-entry-row td,
       .new-entry-row td:first-child{
         display:block;
@@ -544,7 +605,23 @@
               </thead>
 
               <tbody id="tableBody">
-                <tr class="new-entry-row">
+                <tr class="mobile-entry-toggle-row">
+                  <td colspan="6">
+                    <button
+                      id="mobileEntryToggle"
+                      type="button"
+                      class="mobile-entry-toggle"
+                      aria-expanded="false"
+                      aria-controls="newEntryRow"
+                    >
+                      <span class="plus-mark" aria-hidden="true">+</span>
+                      <span id="mobileEntryLabel">New entry</span>
+                      <span id="mobileTodayLabel" class="mobile-entry-date">Today</span>
+                      <span class="mobile-entry-chevron" aria-hidden="true"></span>
+                    </button>
+                  </td>
+                </tr>
+                <tr id="newEntryRow" class="new-entry-row">
                   <td>
                     <div class="new-entry-marker" title="New entry">
                       <span class="plus-mark" aria-hidden="true">+</span>
@@ -651,6 +728,10 @@
         saveButton: document.getElementById('saveButton'),
         entryStatus: document.getElementById('entryStatus'),
         todayLabel: document.getElementById('todayLabel'),
+        mobileTodayLabel: document.getElementById('mobileTodayLabel'),
+        mobileEntryToggle: document.getElementById('mobileEntryToggle'),
+        mobileEntryLabel: document.getElementById('mobileEntryLabel'),
+        newEntryRow: document.getElementById('newEntryRow'),
         saveFrame: document.getElementById('htwSaveFrame')
       };
 
@@ -792,9 +873,14 @@
 
       function isDuplicateHeader(entry) {
         const cells=(entry && entry.cells)||[];
-        return cells.length>=6 && HEADERS.every((heading,i)=>
-          String(cells[i]||'').trim().toLowerCase()===heading.toLowerCase()
-        );
+        const normalise=value=>String(value==null?'':value)
+          .toLowerCase().replace(/[^a-z0-9]/g,'');
+        const matches=HEADERS.reduce((count,heading,index)=>
+          count+(normalise(cells[index])===normalise(heading)?1:0),0);
+        const nonblank=cells.slice(0,6).filter(value=>String(value==null?'':value).trim()).length;
+        // Exclude duplicate or partly filled header rows without hiding dated entries.
+        return normalise(cells[0])==='date' || matches>=4 ||
+          (matches>=3 && matches===nonblank);
       }
 
       function renderRows(entries) {
@@ -831,7 +917,10 @@
         if (!state.pendingSave) els.saveButton.disabled=false;
         renderHeaders(payload.headers || HEADERS);
         renderRows(state.entries);
-        if (payload.todayLabel)els.todayLabel.textContent=payload.todayLabel;
+        if (payload.todayLabel){
+          els.todayLabel.textContent=payload.todayLabel;
+          els.mobileTodayLabel.textContent=payload.todayLabel;
+        }
         setDataState('live','LIVE data');
         setLoading(false);
       }
@@ -869,6 +958,20 @@
         if(active)setDataState('saving','Saving…');
       }
 
+      function setMobileEditorOpen(open) {
+        els.newEntryRow.classList.toggle('is-open',open);
+        els.mobileEntryToggle.setAttribute('aria-expanded',String(open));
+      }
+
+      let savedLabelTimer=null;
+      els.mobileEntryToggle.addEventListener('click',()=>{
+        window.clearTimeout(savedLabelTimer);
+        els.mobileEntryLabel.textContent='New entry';
+        const opening=els.mobileEntryToggle.getAttribute('aria-expanded')!=='true';
+        setMobileEditorOpen(opening);
+        if(opening)els.situation.focus({preventScroll:true});
+      });
+
       function finishSave(error) {
         const pending=state.pendingSave;
         if (!pending) return;
@@ -886,7 +989,17 @@
         });
         setDataState('live','LIVE data');
         setEntryStatus('Saved','success');
-        els.situation.focus();
+        if(window.matchMedia('(max-width:700px)').matches){
+          setMobileEditorOpen(false);
+          els.mobileEntryLabel.textContent='Saved';
+          els.mobileEntryToggle.focus({preventScroll:true});
+          window.clearTimeout(savedLabelTimer);
+          savedLabelTimer=window.setTimeout(()=>{
+            els.mobileEntryLabel.textContent='New entry';
+          },3000);
+        }else{
+          els.situation.focus();
+        }
       }
 
       async function confirmSave() {
