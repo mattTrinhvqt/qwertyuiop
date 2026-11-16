@@ -151,9 +151,8 @@
       table-layout:auto;
     }
 
-    /* Content-aware sizing. Short / mostly empty columns stay compact,
-       while text-heavy columns naturally receive more room. */
-    col.date{width:1%}
+    /* Column widths are recalculated from saved content on every data refresh. */
+    col.date{width:94px}
 
     th,td{
       padding:10px 11px;
@@ -268,6 +267,7 @@
       width:100%;
       min-height:50px;
       max-height:180px;
+      min-width:0;
       resize:none;
       overflow-y:auto;
       padding:7px 7px;
@@ -376,6 +376,15 @@
     @keyframes loading{
       0%{transform:translateX(-120%)}
       100%{transform:translateX(360%)}
+    }
+
+    .hidden-frame{
+      position:absolute;
+      width:1px;
+      height:1px;
+      border:0;
+      opacity:0;
+      pointer-events:none;
     }
 
     @media(max-width:700px){
@@ -539,6 +548,7 @@
           </form>
         </div>
       </div>
+      <iframe id="htwSaveFrame" name="htwSaveFrame" class="hidden-frame" title="Save worksheet entry"></iframe>
     </main>
   </div>
 
@@ -546,20 +556,16 @@
     (() => {
       'use strict';
 
-      const REFRESH_MS = 60000;
-      const BRIDGE_TIMEOUT_MS = 10000;
-      const BRIDGE_WAIT_MS = 6000;
-      const BRIDGE_POLL_MS = 100;
+      // This is the HELPFUL THINKING WORKSHEET backend, not the Mmood backend.
+      const CONFIG = Object.freeze({
+        backendUrl: 'https://script.google.com/macros/s/AKfycbxu3Wfh7VJZ48_Z4s0n_t8GIgfeJByTnol0j9UiQrlwjHy7MZD-ULfS4oSGJ4youewt/exec',
+        refreshMs: 60000,
+        loadTimeoutMs: 20000,
+        saveTimeoutMs: 22000
+      });
 
-      const FALLBACK_HEADERS = [
-        'Date',
-        'Situation',
-        'Awareness',
-        'Self-analysis',
-        'Challenge',
-        'Replace'
-      ];
-
+      const HEADERS = ['Date','Situation','Awareness','Self-analysis','Challenge','Replace'];
+      const state = { entries: [], pendingSave: null, callbackCounter: 0, busyLoading: false, hasLoaded: false };
       const els = {
         dataState: document.getElementById('dataState'),
         dataStateText: document.getElementById('dataStateText'),
@@ -567,7 +573,6 @@
         tableHead: document.getElementById('tableHead'),
         tableBody: document.getElementById('tableBody'),
         loadingBar: document.getElementById('loadingBar'),
-        loadingRow: document.getElementById('loadingRow'),
         entryForm: document.getElementById('entryForm'),
         situation: document.getElementById('situation'),
         awareness: document.getElementById('awareness'),
@@ -576,322 +581,347 @@
         replace: document.getElementById('replace'),
         saveButton: document.getElementById('saveButton'),
         entryStatus: document.getElementById('entryStatus'),
-        todayLabel: document.getElementById('todayLabel')
+        todayLabel: document.getElementById('todayLabel'),
+        saveFrame: document.getElementById('htwSaveFrame')
       };
 
-      let bridgeTimeout = null;
-      let saveInProgress = false;
-
-      function hasAppsScriptBridge() {
-        return Boolean(window.google && google.script && google.script.run);
-      }
-
-      function waitForAppsScriptBridge() {
-        return new Promise((resolve, reject) => {
-          const started = Date.now();
-
-          const check = () => {
-            if (hasAppsScriptBridge()) {
-              resolve();
-              return;
-            }
-
-            if (Date.now() - started >= BRIDGE_WAIT_MS) {
-              reject(new Error('Apps Script bridge unavailable.'));
-              return;
-            }
-
-            window.setTimeout(check, BRIDGE_POLL_MS);
-          };
-
-          check();
-        });
-      }
-
-      function setDataState(mode, text) {
+      function setDataState(mode, message) {
         els.dataState.classList.toggle('is-live', mode === 'live');
         els.dataState.classList.toggle('is-saving', mode === 'saving');
         els.dataState.classList.toggle('is-error', mode === 'error');
-        els.dataStateText.textContent = text;
+        els.dataStateText.textContent = message;
       }
 
-      function setEntryStatus(text, mode = '') {
+      function setEntryStatus(message, mode = '') {
+        els.entryStatus.textContent = message;
         els.entryStatus.classList.toggle('is-success', mode === 'success');
         els.entryStatus.classList.toggle('is-error', mode === 'error');
-        els.entryStatus.textContent = text;
       }
 
-      function setLoading(isLoading) {
-        els.loadingBar.hidden = !isLoading;
+      function setLoading(active) {
+        els.loadingBar.hidden = !active;
+      }
+
+      function backendReady() {
+        return /^https:\/\/script\.google\.com\/macros\/s\/.+\/exec(?:\?.*)?$/.test(CONFIG.backendUrl);
+      }
+
+      // GitHub pages cannot call google.script.run. Use a script-tag JSONP read,
+      // as Mmood does, avoiding a CORS-blocked fetch.
+      function jsonp(action) {
+        return new Promise((resolve,reject) => {
+          if (!backendReady()) {
+            reject(new Error('Add the worksheet Apps Script /exec URL to CONFIG.backendUrl.'));
+            return;
+          }
+
+          const callback = '__htwCallback' + (++state.callbackCounter);
+          const script = document.createElement('script');
+          let finished = false;
+          const timeout = window.setTimeout(() => finish(new Error('Data request timed out.')),CONFIG.loadTimeoutMs);
+
+          function finish(error,payload) {
+            if (finished) return;
+            finished = true;
+            window.clearTimeout(timeout);
+            try { delete window[callback]; } catch (_) { window[callback] = undefined; }
+            script.remove();
+            if (error) reject(error);
+            else resolve(payload);
+          }
+
+          window[callback] = payload => finish(null,payload);
+          const url = new URL(CONFIG.backendUrl);
+          url.searchParams.set('action',action);
+          url.searchParams.set('callback',callback);
+          url.searchParams.set('_',String(Date.now()));
+          script.onerror = () => finish(new Error('Could not reach the worksheet backend. Check deployment access and URL.'));
+          script.src = url.toString();
+          document.head.appendChild(script);
+        });
       }
 
       function updateStickyHeaderOffset() {
-        requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
           const height = Math.ceil(els.tableHead.getBoundingClientRect().height || 33);
-          document.documentElement.style.setProperty('--table-head-height', height + 'px');
+          document.documentElement.style.setProperty('--table-head-height',height + 'px');
         });
       }
 
       function renderHeaders(headers) {
-        els.tableHead.innerHTML = '';
-
-        (headers && headers.length ? headers : FALLBACK_HEADERS)
-          .slice(0, 6)
-          .forEach(label => {
-            const th = document.createElement('th');
-            th.scope = 'col';
-            th.textContent = label;
-            els.tableHead.appendChild(th);
-          });
-
+        els.tableHead.replaceChildren();
+        (Array.isArray(headers) ? headers : HEADERS).slice(0,6).forEach(name => {
+          const th=document.createElement('th');
+          th.scope='col';
+          th.textContent=String(name);
+          els.tableHead.appendChild(th);
+        });
         updateStickyHeaderOffset();
       }
 
       function removeDataRows() {
-        els.tableBody.querySelectorAll('.data-row, .empty-data-row, .error-data-row')
+        els.tableBody.querySelectorAll('.data-row,.empty-data-row,.error-data-row,#loadingRow')
           .forEach(row => row.remove());
-
-        const loadingRow = document.getElementById('loadingRow');
-        if (loadingRow) loadingRow.remove();
       }
 
-      function renderRows(rows) {
+      function messageRow(message,cssClass) {
         removeDataRows();
+        const tr=document.createElement('tr');
+        tr.className=cssClass === 'error-state' ? 'error-data-row' : 'empty-data-row';
+        const td=document.createElement('td');
+        td.colSpan=6;
+        td.className=cssClass;
+        td.textContent=message;
+        tr.appendChild(td);
+        els.tableBody.appendChild(tr);
+      }
 
-        if (!rows.length) {
-          const tr = document.createElement('tr');
-          tr.className = 'empty-data-row';
+      // Use a fixed viewport width but dynamically distribute that width across
+      // columns according to visible content. Empty columns stay compact.
+      function sizeColumns(entries) {
+        const caps=[10,36,32,44,32,42];
+        const baseline=[10,13,12,16,12,14];
+        const weights=baseline.map((base,i) => {
+          const seen=entries.slice(0,150)
+            .map(entry => String((entry.cells||[])[i]||'').trim().length)
+            .sort((a,b) => a-b);
+          const p=seen.length ? seen[Math.floor((seen.length-1)*0.8)] : 0;
+          return Math.max(base,Math.min(caps[i],p*0.65+base*0.35));
+        });
+        // The date column is always 94px; other widths are relative percentages.
+        const rest=weights.slice(1).reduce((a,b)=>a+b,0);
+        const cols=document.querySelectorAll('colgroup col');
+        if(cols.length!==6)return;
+        cols[0].style.width='94px';
+        for(let i=1;i<6;i++) {
+          const fraction=weights[i]/rest;
+          cols[i].style.width=`calc(${(fraction*100).toFixed(3)}% - ${(fraction*94).toFixed(2)}px)`;
+        }
+      }
 
-          const td = document.createElement('td');
-          td.colSpan = 6;
-          td.className = 'empty-state';
-          td.textContent = 'No saved entries yet';
-
-          tr.appendChild(td);
-          els.tableBody.appendChild(tr);
-          els.tableCount.textContent = '0 entries';
+      function renderRows(entries) {
+        removeDataRows();
+        if (!entries.length) {
+          messageRow('No saved entries yet','empty-state');
+          els.tableCount.textContent='0 entries';
           return;
         }
-
-        const fragment = document.createDocumentFragment();
-
-        rows.forEach(row => {
-          const tr = document.createElement('tr');
-          tr.className = 'data-row';
-
-          for (let index = 0; index < 6; index += 1) {
-            const td = document.createElement('td');
-            const value = row[index] == null ? '' : String(row[index]).trim();
-
-            td.textContent = value || '—';
-
-            if (index === 0) {
-              td.classList.add('date-cell');
-            }
-
-            if (!value) {
-              td.classList.add('empty-cell');
-            }
-
-            tr.appendChild(td);
-          }
-
-          fragment.appendChild(tr);
+        sizeColumns(entries);
+        const fragment=document.createDocumentFragment();
+        entries.forEach(entry => {
+          const row=document.createElement('tr');
+          row.className='data-row';
+          (entry.cells||[]).slice(0,6).forEach((raw,index) => {
+            const td=document.createElement('td');
+            const value=raw==null?'':String(raw).trim();
+            td.textContent=value||'—';
+            if(index===0)td.classList.add('date-cell');
+            if(!value)td.classList.add('empty-cell');
+            row.appendChild(td);
+          });
+          fragment.appendChild(row);
         });
-
         els.tableBody.appendChild(fragment);
-        els.tableCount.textContent =
-          rows.length + (rows.length === 1 ? ' entry' : ' entries');
+        els.tableCount.textContent=entries.length+(entries.length===1?' entry':' entries');
       }
 
       function renderPayload(payload) {
-        renderHeaders(payload?.headers || FALLBACK_HEADERS);
-        renderRows(Array.isArray(payload?.rows) ? payload.rows : []);
-
-        if (payload?.todayLabel) {
-          els.todayLabel.textContent = payload.todayLabel;
+        if (!payload || payload.ok !== true || !Array.isArray(payload.entries)) {
+          throw new Error(payload && payload.error ? payload.error : 'Unexpected backend response.');
         }
-
+        state.entries=payload.entries;
+        state.hasLoaded=true;
+        if (!state.pendingSave) els.saveButton.disabled=false;
+        renderHeaders(payload.headers || HEADERS);
+        renderRows(state.entries);
+        if (payload.todayLabel)els.todayLabel.textContent=payload.todayLabel;
+        setDataState('live','LIVE data');
         setLoading(false);
-        setDataState('live', 'LIVE data');
       }
 
-      function renderLoadError(error) {
-        clearTimeout(bridgeTimeout);
-        setLoading(false);
-        setDataState('error', 'Data unavailable');
-        removeDataRows();
-
-        const tr = document.createElement('tr');
-        tr.className = 'error-data-row';
-
-        const td = document.createElement('td');
-        td.colSpan = 6;
-        td.className = 'error-state';
-        td.textContent =
-          'Could not load Sheet1. ' +
-          (error?.message || 'Please refresh.');
-
-        tr.appendChild(td);
-        els.tableBody.appendChild(tr);
-        els.tableCount.textContent = 'Data unavailable';
+      async function loadEntries({ quiet=false } = {}) {
+        if (state.busyLoading) return;
+        state.busyLoading=true;
+        if(!quiet){setLoading(true);setDataState('','Loading…');}
+        try {
+          const payload=await jsonp('list');
+          renderPayload(payload);
+        } catch(error) {
+          console.error(error);
+          setLoading(false);
+          setDataState('error','Unavailable');
+          if(!quiet || !state.entries.length) {
+            messageRow('Could not load Sheet1: '+(error.message||String(error)),'error-state');
+            els.tableCount.textContent='Data unavailable';
+          }
+        } finally {state.busyLoading=false;}
       }
 
-      function showWrongHostError() {
-        renderHeaders(FALLBACK_HEADERS);
-        setLoading(false);
-        setDataState('error', 'Apps Script required');
-        setEntryStatus(
-          'Open the deployed Google Apps Script /exec web-app URL to view or save entries.',
-          'error'
-        );
-        els.saveButton.disabled = true;
-        removeDataRows();
-
-        const tr = document.createElement('tr');
-        tr.className = 'error-data-row';
-
-        const td = document.createElement('td');
-        td.colSpan = 6;
-        td.className = 'error-state';
-        td.textContent =
-          'This page is not running inside Google Apps Script. Open the deployed /exec web-app URL instead.';
-
-        tr.appendChild(td);
-        els.tableBody.appendChild(tr);
-        els.tableCount.textContent = 'Not connected';
-      }
-
-      function loadData({quiet = false} = {}) {
-        if (!hasAppsScriptBridge()) {
-          showWrongHostError();
-          return;
-        }
-
-        if (!quiet) {
-          setLoading(true);
-          setDataState('', 'Connecting…');
-        }
-
-        clearTimeout(bridgeTimeout);
-        bridgeTimeout = setTimeout(() => {
-          renderLoadError({message:'The Apps Script connection did not respond.'});
-        }, BRIDGE_TIMEOUT_MS);
-
-        google.script.run
-          .withSuccessHandler(payload => {
-            clearTimeout(bridgeTimeout);
-            renderPayload(payload);
-          })
-          .withFailureHandler(error => {
-            clearTimeout(bridgeTimeout);
-            renderLoadError(error);
-          })
-          .getHelpfulThinkingData();
-      }
-
-      function currentEntry() {
+      function valuesFromInput() {
         return {
-          situation: els.situation.value.trim(),
-          awareness: els.awareness.value.trim(),
-          selfAnalysis: els.selfAnalysis.value.trim(),
-          challenge: els.challenge.value.trim(),
-          replace: els.replace.value.trim()
+          situation:els.situation.value.trim(),
+          awareness:els.awareness.value.trim(),
+          selfAnalysis:els.selfAnalysis.value.trim(),
+          challenge:els.challenge.value.trim(),
+          replace:els.replace.value.trim()
         };
       }
 
-      function clearInputs() {
-        [els.situation, els.awareness, els.selfAnalysis, els.challenge, els.replace]
-          .forEach(input => {
-            input.value = '';
-            input.style.height = '';
-          });
+      function setSaving(active) {
+        els.saveButton.disabled=active;
+        els.saveButton.textContent=active?'Saving…':'Save';
+        if(active)setDataState('saving','Saving…');
       }
 
-      function saveEntry(event) {
-        event.preventDefault();
-
-        if (saveInProgress) return;
-
-        if (!hasAppsScriptBridge()) {
-          showWrongHostError();
+      function finishSave(error) {
+        const pending=state.pendingSave;
+        if (!pending) return;
+        window.clearTimeout(pending.timeout);
+        state.pendingSave=null;
+        setSaving(false);
+        if (error) {
+          setDataState('error','Save not confirmed');
+          setEntryStatus(error.message||String(error),'error');
           return;
         }
+        [els.situation,els.awareness,els.selfAnalysis,els.challenge,els.replace].forEach(input=>{
+          input.value='';
+          input.style.height='';
+        });
+        setDataState('live','LIVE data');
+        setEntryStatus('Saved. Newest entries appear first.','success');
+        els.situation.focus();
+      }
 
-        const entry = currentEntry();
+      async function confirmSave() {
+        const pending=state.pendingSave;
+        if (!pending || pending.checking) return;
+        pending.checking=true;
+        try {
+          const payload=await jsonp('list');
+          if (payload.ok !== true || !Array.isArray(payload.entries))
+            throw new Error(payload.error||'Could not verify the saved entry.');
+          const newItem=payload.entries.find(entry => {
+            if (pending.row && Number(entry.row)===Number(pending.row))return true;
+            if (pending.beforeRows.has(Number(entry.row)))return false;
+            const values=(entry.cells||[]).slice(1,6).map(x=>String(x||'').trim());
+            return values.every((value,i)=>value===Object.values(pending.values)[i]);
+          });
+          renderPayload(payload);
+          if (newItem) {
+            finishSave(null);
+          } else if (pending.attempts++ < 4) {
+            pending.checking=false;
+            window.setTimeout(confirmSave,650);
+            return;
+          } else {
+            finishSave(new Error('Save could not be confirmed. Please check Sheet1 before trying again to avoid a duplicate entry.'));
+          }
+        } catch(error) {
+          pending.checking=false;
+          if (pending.attempts++ < 4) {
+            window.setTimeout(confirmSave,900);
+          } else {
+            finishSave(new Error('Could not verify the save: '+(error.message||String(error))+'. Check Sheet1 before retrying.'));
+          }
+          return;
+        }
+        if(state.pendingSave)state.pendingSave.checking=false;
+      }
 
-        if (!Object.values(entry).some(Boolean)) {
-          setEntryStatus('Type something into the new row before saving.', 'error');
+      // POST with a hidden iframe, matching Mmood's cross-origin save approach.
+      // Saving is reported as successful only after a subsequent verified read.
+      function saveEntry(event) {
+        event.preventDefault();
+        if(state.pendingSave)return;
+        if (!state.hasLoaded) {
+          setEntryStatus('Please allow the worksheet to load before saving.','error');
+          return;
+        }
+        if (!backendReady()) {
+          setEntryStatus('The Apps Script backend URL has not been configured.','error');
+          return;
+        }
+        const values=valuesFromInput();
+        if(!Object.values(values).some(Boolean)) {
+          setEntryStatus('Type something into the new row before saving.','error');
           els.situation.focus();
           return;
         }
-
-        saveInProgress = true;
-        els.saveButton.disabled = true;
-        els.saveButton.textContent = 'Saving…';
-        setDataState('saving', 'Saving…');
-        setEntryStatus('Saving entry…');
-
-        google.script.run
-          .withSuccessHandler(payload => {
-            saveInProgress = false;
-            els.saveButton.disabled = false;
-            els.saveButton.textContent = 'Save';
-            clearInputs();
-            renderPayload(payload);
-            setEntryStatus('Saved. Newest entries appear first.', 'success');
-            els.situation.focus();
-          })
-          .withFailureHandler(error => {
-            saveInProgress = false;
-            els.saveButton.disabled = false;
-            els.saveButton.textContent = 'Save';
-            setDataState('error', 'Save failed');
-            setEntryStatus(
-              'Could not save. ' + (error?.message || 'Please try again.'),
-              'error'
-            );
-          })
-          .addHelpfulThinkingEntry(entry);
+        const requestId=Date.now()+'-'+Math.random().toString(36).slice(2);
+        state.pendingSave={
+          requestId,values,
+          beforeRows:new Set(state.entries.map(e=>Number(e.row))),
+          attempts:0,checking:false,row:null,
+          timeout:window.setTimeout(() => {
+            if(state.pendingSave && state.pendingSave.requestId===requestId)
+              finishSave(new Error('Save timed out. Check Sheet1 before trying again to avoid duplicates.'));
+          },CONFIG.saveTimeoutMs)
+        };
+        setSaving(true);
+        setEntryStatus('Saving…');
+        const form=document.createElement('form');
+        form.method='POST';
+        form.action=CONFIG.backendUrl;
+        form.target='htwSaveFrame';
+        form.style.display='none';
+        const fields={action:'add',requestId,...values};
+        Object.entries(fields).forEach(([name,value])=>{
+          const input=document.createElement('input');
+          input.type='hidden';
+          input.name=name;
+          input.value=value;
+          form.appendChild(input);
+        });
+        document.body.appendChild(form);
+        form.submit();
+        form.remove();
       }
+
+      // Depending on Google sandboxing the postMessage may not arrive directly;
+      // iframe load + re-reading the sheet remains a reliable fallback.
+      window.addEventListener('message',event=>{
+        const pending=state.pendingSave;
+        const data=event.data;
+        if(!pending || !data || data.type!=='htw-save')return;
+        if(String(data.requestId)!==pending.requestId)return;
+        if(data.payload && data.payload.ok===false){
+          finishSave(new Error(data.payload.error||'Could not save entry.'));
+          return;
+        }
+        if(data.payload && data.payload.ok===true){
+          pending.row=data.payload.row;
+          window.setTimeout(confirmSave,200);
+        }
+      });
+
+      els.saveFrame.addEventListener('load',()=>{
+        if(state.pendingSave)window.setTimeout(confirmSave,350);
+      });
 
       function autoGrow(textarea) {
-        textarea.style.height = 'auto';
-        textarea.style.height = Math.min(textarea.scrollHeight, 180) + 'px';
+        textarea.style.height='auto';
+        textarea.style.height=Math.min(textarea.scrollHeight,180)+'px';
       }
 
-      document.querySelectorAll('.entry-input').forEach(textarea => {
-        textarea.addEventListener('input', () => autoGrow(textarea));
-
-        textarea.addEventListener('keydown', event => {
-          if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+      document.querySelectorAll('.entry-input').forEach(textarea=>{
+        textarea.addEventListener('input',()=>autoGrow(textarea));
+        textarea.addEventListener('keydown',event=>{
+          if((event.ctrlKey||event.metaKey)&&event.key==='Enter'){
             event.preventDefault();
             els.entryForm.requestSubmit();
           }
         });
       });
 
-      renderHeaders(FALLBACK_HEADERS);
-      els.entryForm.addEventListener('submit', saveEntry);
-      window.addEventListener('resize', updateStickyHeaderOffset);
-
-      async function initialiseApp() {
-        setLoading(true);
-        setDataState('', 'Connecting…');
-
-        try {
-          await waitForAppsScriptBridge();
-          loadData();
-
-          window.setInterval(() => {
-            if (!saveInProgress) loadData({quiet:true});
-          }, REFRESH_MS);
-        } catch (error) {
-          showWrongHostError();
-        }
-      }
-
-      initialiseApp();
+      renderHeaders(HEADERS);
+      els.saveButton.disabled=true;
+      els.entryForm.addEventListener('submit',saveEntry);
+      window.addEventListener('resize',updateStickyHeaderOffset);
+      loadEntries();
+      window.setInterval(()=>{
+        if(!state.pendingSave)loadEntries({quiet:true});
+      },CONFIG.refreshMs);
     })();
   </script>
 </body>
